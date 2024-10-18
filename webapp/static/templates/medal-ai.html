@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Medal AI - Immersive Precision Medicine Chat</title>
+    <title>MIDAS - Immersive Precision Medicine Chat</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/2.8.2/alpine.js" defer></script>
 
@@ -145,7 +145,7 @@
     <div class="sidebar fixed top-0 left-0 h-full w-64 text-white shadow-lg z-50 transform transition-transform duration-300 ease-in-out"
         :class="{ 'translate-x-0': sidebarOpen, '-translate-x-full': !sidebarOpen }">
         <div class="p-6">
-            <img src="static/medal-logo.png" alt="Medal AI Logo" class="h-30 mb-8 filter invert">
+            <img src="static/medal-logo.png" alt="MIDAS Logo" class="h-30 mb-8 filter invert">
             <nav>
                 <ul class="space-y-4">
                     <li><a href="home"
@@ -178,7 +178,7 @@
                 </svg>
             </div>
             <div class="container mx-auto px-6 text-center">
-                <h1 class="text-4xl md:text-5xl font-bold mb-4">Chat with Medal AI</h1>
+                <h1 class="text-4xl md:text-5xl font-bold mb-4">Chat with MIDAS</h1>
             </div>
         </section>
         <section class="flex-grow bg-gray-100 overflow-y-auto">
@@ -210,7 +210,7 @@
                 <form id="chat-form" class="flex items-center">
                     <input type="text" id="user-input"
                         class="flex-grow px-4 py-2 border rounded-l-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Ask Medal AI about precision medicine...">
+                        placeholder="Ask MIDAS about precision medicine...">
                     <button type="submit"
                         class="bg-blue-600 text-white px-6 py-2 rounded-r-full hover:bg-blue-700 transition duration-300 flex items-center">
                         <span class="mr-2">Send</span>
@@ -240,7 +240,7 @@
         });
 
         // Add an initial welcome message
-        addMessage('ai', 'Welcome to Medal AI! How can I assist you with precision medicine today?');
+        addMessage('ai', 'Welcome to MIDAS! How can I assist you with precision medicine today?');
 
         chatForm.addEventListener('submit', function (e) {
             e.preventDefault();
@@ -336,7 +336,7 @@
             indicatorDiv.className = 'flex justify-start message-appear';
             indicatorDiv.innerHTML = `
                 <div class="bg-gray-200 text-gray-600 rounded-lg p-3 shadow-md flex items-center">
-                    <span class="mr-2">Medal AI is thinking</span>
+                    <span class="mr-2">MIDAS is thinking</span>
                     <div class="flex space-x-1">
                         <div class="w-2 h-2 bg-gray-600 rounded-full pulse"></div>
                         <div class="w-2 h-2 bg-gray-600 rounded-full pulse" style="animation-delay: 0.2s"></div>

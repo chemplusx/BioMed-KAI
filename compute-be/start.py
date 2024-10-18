@@ -7,7 +7,7 @@ from model.media_server import MediaServer
 
 async def main():
     server = MediaServer()
-    async with websockets.serve(server.handle_client, "localhost", 8765):
+    async with websockets.serve(server.handle_client, "0.0.0.0", 8765):
         print("WebSocket server started on ws://localhost:8765")
         await asyncio.Future()  # Run forever
 
