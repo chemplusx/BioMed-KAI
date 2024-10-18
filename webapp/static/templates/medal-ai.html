@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medal AI - Immersive Precision Medicine Chat</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/2.8.2/alpine.js" defer></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <link href="css/styles.css" rel="stylesheet">
+    <style>
+        html,
+        body {
+            height: 100%;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .chat-container {
+            height: calc(100vh - 64px - 360px);
+            /* Adjusted to accommodate sample inputs */
+        }
+
+        .message-appear {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: .5;
+            }
+        }
+
+        .sample-input {
+            transition: all 0.3s ease;
+        }
+
+        .sample-input:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .markdown-content h1 {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-top: 1em;
+            margin-bottom: 0.5em;
+        }
+
+        .markdown-content h2 {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-top: 1em;
+            margin-bottom: 0.5em;
+        }
+
+        .markdown-content h3 {
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-top: 1em;
+            margin-bottom: 0.5em;
+        }
+
+        .markdown-content p {
+            margin-bottom: 0.5em;
+        }
+
+        .markdown-content ul,
+        .markdown-content ol {
+            margin-left: 1.5em;
+            margin-bottom: 0.5em;
+        }
+
+        .markdown-content code {
+            background-color: #f0f0f0;
+            padding: 0.2em 0.4em;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+
+        .markdown-content pre {
+            background-color: #f0f0f0;
+            padding: 1em;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+
+        .markdown-content blockquote {
+            border-left: 4px solid #ccc;
+            padding-left: 1em;
+            margin-left: 0;
+            font-style: italic;
+        }
+
+        .markdown-content a {
+            color: #3498db;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body class="font-sans text-gray-800 flex flex-col min-h-screen bg-gray-100" x-data="{ sidebarOpen: false }">
+
+    <div class="sidebar fixed top-0 left-0 h-full w-64 text-white shadow-lg z-50 transform transition-transform duration-300 ease-in-out"
+        :class="{ 'translate-x-0': sidebarOpen, '-translate-x-full': !sidebarOpen }">
+        <div class="p-6">
+            <img src="static/medal-logo.png" alt="Medal AI Logo" class="h-30 mb-8 filter invert">
+            <nav>
+                <ul class="space-y-4">
+                    <li><a href="home"
+                            class="text-white font-semibold px-5 block py-2 bg-blue-600 rounded transition duration-300">Home</a>
+                    </li>
+                    <li><a href="medal-ai"
+                            class="text-gray-300 px-5 block py-2 hover:bg-blue-600 rounded transition duration-300">Medal-AI</a>
+                    </li>
+                    <li><a href="source"
+                            class="text-gray-300 px-5 block py-2 hover:bg-blue-600 rounded transition duration-300">Knowledge Graph</a></li>
+                    <li><a href="about"
+                            class="text-gray-300 px-5 block py-2 hover:bg-blue-600 rounded transition duration-300">About</a>
+                    </li>
+                    <li><a href="contact"
+                            class="text-gray-300 px-5 block py-2 hover:bg-blue-600 rounded transition duration-300">Contact Us</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    <div class="overlay fixed inset-0 bg-black opacity-50 z-40" x-show="sidebarOpen" @click="sidebarOpen = false"></div>
+
+    <main class="flex-grow">
+        <section class="animated-bg text-white py-10">
+            <div class="sidebar-toggle absolute top-4 left-4 z-50" :class="{ 'active': sidebarOpen }" @click="sidebarOpen = !sidebarOpen">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </div>
+            <div class="container mx-auto px-6 text-center">
+                <h1 class="text-4xl md:text-5xl font-bold mb-4">Chat with Medal AI</h1>
+            </div>
+        </section>
+        <section class="flex-grow bg-gray-100 overflow-y-auto">
+            <div id="chat-messages" class="p-6 space-y-4 relative z-10">
+                <!-- Chat messages will be inserted here -->
+            </div>
+        </section>
+
+        <section class="bg-white shadow-md py-4">
+            <div class="container mx-auto px-6">
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div
+                        class="sample-input bg-gray-200 text-gray-700 rounded-lg p-3 cursor-pointer hover:bg-gray-300 text-sm">
+                        What are the latest advancements in cancer immunotherapy?
+                    </div>
+                    <div
+                        class="sample-input bg-gray-200 text-gray-700 rounded-lg p-3 cursor-pointer hover:bg-gray-300 text-sm">
+                        How does pharmacogenomics influence drug efficacy?
+                    </div>
+                    <div
+                        class="sample-input bg-gray-200 text-gray-700 rounded-lg p-3 cursor-pointer hover:bg-gray-300 text-sm">
+                        Can you explain the role of biomarkers in precision medicine?
+                    </div>
+                    <div
+                        class="sample-input bg-gray-200 text-gray-700 rounded-lg p-3 cursor-pointer hover:bg-gray-300 text-sm">
+                        What are the ethical considerations in genetic testing?
+                    </div>
+                </div>
+                <form id="chat-form" class="flex items-center">
+                    <input type="text" id="user-input"
+                        class="flex-grow px-4 py-2 border rounded-l-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Ask Medal AI about precision medicine...">
+                    <button type="submit"
+                        class="bg-blue-600 text-white px-6 py-2 rounded-r-full hover:bg-blue-700 transition duration-300 flex items-center">
+                        <span class="mr-2">Send</span>
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <!-- <footer class="bg-white shadow-md py-4 sticky bottom-0 z-50">
+        
+    </footer> -->
+
+    <script>
+        const chatMessages = document.getElementById('chat-messages');
+        const chatForm = document.getElementById('chat-form');
+        const userInput = document.getElementById('user-input');
+
+        marked.use({
+            breaks: true,
+            gfm: true,
+            highlight: function (code, language) {
+                const validLanguage = hljs.getLanguage(language) ? language : 'plaintext';
+                return hljs.highlight(validLanguage, code).value;
+            },
+        });
+
+        // Add an initial welcome message
+        addMessage('ai', 'Welcome to Medal AI! How can I assist you with precision medicine today?');
+
+        chatForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            sendMessage();
+        });
+
+        function sendMessage() {
+            const message = userInput.value.trim();
+            if (message) {
+                addMessage('user', message);
+                userInput.value = '';
+                streamResponse(message);
+            }
+        }
+
+        async function streamResponse(message) {
+            const thinkingIndicator = addThinkingIndicator();
+
+            try {
+                const response = await fetch('http://localhost:5000/api/stream', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ text: message }),
+                });
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+
+                let aiMessageElement = addMessage('ai', '');
+                let fullResponse = '';
+
+                while (true) {
+                    const { done, value } = await reader.read();
+
+                    if (done) {
+                        console.log("Stream complete");
+                        break;
+                    }
+
+                    const chunk = decoder.decode(value);
+                    const lines = chunk.split('\n');
+                    let eor = false;
+                    removeThinkingIndicator(thinkingIndicator);
+                    for (const line of lines) {
+                        if (line.startsWith('data:')) {
+                            const jsonStr = line.slice(5).trim();
+                            try {
+                                if (jsonStr === '<EOR>') {
+                                    eor = true;
+                                    break;
+                                }
+                                const data = JSON.parse(jsonStr);
+                                fullResponse += data.chunk || '';
+                                aiMessageElement.innerHTML = marked.parse(fullResponse);
+                                hljs.highlightAll();
+                                chatMessages.scrollTop = chatMessages.scrollHeight;
+                            } catch (e) {
+                                console.error('Error parsing JSON:', e);
+                            }
+                        }
+                    }
+                    if (eor) {
+                        break;
+                    }
+                }
+            } catch (error) {
+                console.error('Streaming failed:', error);
+                addMessage('ai', 'Sorry, an error occurred while processing your request.');
+            } finally {
+                removeThinkingIndicator(thinkingIndicator);
+            }
+        }
+
+        function addMessage(sender, text) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `flex ${sender === 'user' ? 'justify-end' : 'justify-start'} message-appear`;
+            const innerDiv = document.createElement('div');
+            innerDiv.className = `${sender === 'user' ? 'bg-blue-600 text-white' : 'bg-white text-gray-800'} rounded-lg p-3 shadow-md markdown-content`;
+            innerDiv.innerHTML = sender === 'user' ? text : marked.parse(text);
+            if (sender === 'ai') {
+                hljs.highlightAll();
+            }
+            messageDiv.appendChild(innerDiv);
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            return innerDiv;
+        }
+
+        function addThinkingIndicator() {
+            const indicatorDiv = document.createElement('div');
+            indicatorDiv.className = 'flex justify-start message-appear';
+            indicatorDiv.innerHTML = `
+                <div class="bg-gray-200 text-gray-600 rounded-lg p-3 shadow-md flex items-center">
+                    <span class="mr-2">Medal AI is thinking</span>
+                    <div class="flex space-x-1">
+                        <div class="w-2 h-2 bg-gray-600 rounded-full pulse"></div>
+                        <div class="w-2 h-2 bg-gray-600 rounded-full pulse" style="animation-delay: 0.2s"></div>
+                        <div class="w-2 h-2 bg-gray-600 rounded-full pulse" style="animation-delay: 0.4s"></div>
+                    </div>
+                </div>
+            `;
+            chatMessages.appendChild(indicatorDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            return indicatorDiv;
+        }
+
+        function removeThinkingIndicator(indicator) {
+            console.log('Removing thinking indicator');
+            if (indicator && indicator.parentNode) {
+                indicator.parentNode.removeChild(indicator);
+            }
+        }
+
+        // Add event listeners for sample inputs
+        document.querySelectorAll('.sample-input').forEach(input => {
+            input.addEventListener('click', function () {
+                userInput.value = this.textContent.trim();
+                sendMessage();
+            });
+        });
+    </script>
+</body>
+
+</html>

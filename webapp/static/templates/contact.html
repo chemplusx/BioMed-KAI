@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medal AI - Connect with Us</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/2.8.2/alpine.js" defer></script>
+    <link href="css/styles.css" rel="stylesheet">
+    <style>
+        .contact-form-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+        .chat-bot {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #3498db;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .chat-bot:hover {
+            background-color: #2980b9;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+        .chat-bot i {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body class="font-sans text-gray-800 flex flex-col min-h-screen bg-gray-100" x-data="{ sidebarOpen: false }">
+
+    <div class="sidebar fixed top-0 left-0 h-full w-64 text-white shadow-lg z-50 transform transition-transform duration-300 ease-in-out"
+        :class="{ 'translate-x-0': sidebarOpen, '-translate-x-full': !sidebarOpen }">
+        <div class="p-6">
+            <img src="static/medal-logo.png" alt="Medal AI Logo" class="h-30 mb-8 filter invert">
+            <nav>
+                <ul class="space-y-4">
+                    <li><a href="home"
+                            class="text-gray-300 px-5 block py-2 hover:bg-blue-600 rounded transition duration-300">Home</a>
+                    </li>
+                    <li><a href="medal-ai"
+                            class="text-gray-300 px-5 block py-2 hover:bg-blue-600 rounded transition duration-300">Medal-AI</a>
+                    </li>
+                    <li><a href="source"
+                            class="text-gray-300 px-5 block py-2 hover:bg-blue-600 rounded transition duration-300">Knowledge Graph</a></li>
+                    <li><a href="about"
+                            class="text-gray-300 px-5 block py-2 hover:bg-blue-600 rounded transition duration-300">About</a>
+                    </li>
+                    <li><a href="contact"
+                            class="text-white font-semibold px-5 block py-2 bg-blue-600 rounded transition duration-300">Contact Us</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    <div class="overlay fixed inset-0 bg-black opacity-50 z-40" x-show="sidebarOpen" @click="sidebarOpen = false"></div>
+
+    <main class="flex-grow">
+        <section class="animated-bg text-white py-10">
+            <div class="sidebar-toggle absolute top-4 left-4 z-50" :class="{ 'active': sidebarOpen }" @click="sidebarOpen = !sidebarOpen">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </div>
+            <div class="container mx-auto px-6 text-center">
+                <h1 class="text-5xl md:text-6xl font-bold mb-4">Connect with Medal AI</h1>
+                <p class="text-2xl mb-8">Let's shape the future of healthcare together</p>
+            </div>
+        </section>
+
+        <section class="py-10">
+            <div class="container mx-auto px-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                    <div class="bg-white p-8 rounded-lg shadow-lg">
+                        <h2 class="text-2xl font-bold mb-6">Send Us a Message</h2>
+                        <form id="contact-form">
+                            <div class="mb-4">
+                                <label for="name" class="block text-gray-700 font-bold mb-2">Name:</label>
+                                <input type="text" id="name" name="name" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
+                            </div>
+                            <div class="mb-4">
+                                <label for="email" class="block text-gray-700 font-bold mb-2">Email:</label>
+                                <input type="email" id="email" name="email" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
+                            </div>
+                            <div class="mb-4">
+                                <label for="subject" class="block text-gray-700 font-bold mb-2">Subject:</label>
+                                <input type="text" id="subject" name="subject" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
+                            </div>
+                            <div class="mb-4">
+                                <label for="message" class="block text-gray-700 font-bold mb-2">Message:</label>
+                                <textarea id="message" name="message" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500" rows="4"></textarea>
+                            </div>
+                            <button type="submit" class="bg-blue-600 text-white font-bold py-3 px-8 rounded-full hover:bg-blue-700 transition duration-300">Send Message</button>
+                        </form>
+                    </div>
+
+                    <div class="space-y-8">
+                        <div class="bg-white p-8 rounded-lg shadow-lg">
+                            <h2 class="text-3xl font-bold mb-6 text-gray-800">Contact Information</h2>
+                            <div class="space-y-4">
+                                <p class="flex items-center text-gray-600">
+                                    <svg class="w-6 h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                                    prabhagarg@niper.ac.in
+                                </p>
+                                <p class="flex items-center text-gray-600">
+                                    <svg class="w-6 h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                                    +91(172)-2292000 Extn: 2016
+                                </p>
+                                <p class="flex items-center text-gray-600">
+                                    <svg class="w-6 h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                    National Institute of Pharmaceutical Education and Research, S.A.S. Nagar (Mohali), Punjab - 160062
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-4 rounded-lg shadow-lg">
+                            <iframe class="w-full h-72 rounded-lg" src="https://maps.google.com/maps?width=100%&height=400&hl=en&q=NIPER,Mohali&t=&z=14&ie=UTF8&iwloc=B&output=embed" frameborder="0" scrolling="no" marginheight="0" marginwidth="0"></iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-6 text-center">
+            <p>&copy; 2024 Medal AI. All rights reserved.</p>
+            <p class="mt-2">Empowering healthcare through innovative AI solutions</p>
+        </div>
+    </footer>
+
+    <div class="chat-bot">
+        <i class="material-icons">chat</i>
+        <span>Chat with AI Assistant</span>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const chatBot = document.querySelector('.chat-bot');
+            chatBot.addEventListener('click', function () {
+                alert('AI Assistant coming soon! We\'re excited to help you with any questions about Medal AI.');
+            });
+        });
+    </script>
+</body>
+</html>
