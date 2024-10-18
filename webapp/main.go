@@ -21,5 +21,5 @@ func main() {
 	service.Init()
 	log.Println("Server started")
 	server.InitRouter(r)
-	r.Run(":5000")
+	r.Run(":5050")
 }
