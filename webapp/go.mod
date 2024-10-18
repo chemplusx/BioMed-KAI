@@ -1,4 +1,4 @@
-module chemplusx.com/medal-ai
+module chemplusx.com/midas
 
 go 1.23.2
 

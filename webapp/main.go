@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 
-	"chemplusx.com/medal-ai/server"
-	"chemplusx.com/medal-ai/service"
+	"chemplusx.com/midas/server"
+	"chemplusx.com/midas/service"
 
 	"github.com/gin-gonic/gin"
 )

@@ -9,7 +9,7 @@ from pathlib import Path
 
 import logging
 
-logger = logging.getLogger('MEDAL-AI')
+logger = logging.getLogger('MIDAS')
 
 # from nltk_utils import bag_of_words, tokenize
 
@@ -47,7 +47,7 @@ def unload_model():
     model = None
     tokenizer = None
 
-bot_name = "MEDAL-AI"
+bot_name = "MIDAS"
 
 def get_response(sentence, callback):
     global model, tokenizer, rag_pipeline
