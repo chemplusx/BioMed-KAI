@@ -5,16 +5,16 @@ import (
 	"log"
 	"net/http"
 
-	"chemplusx.com/medal-ai/service"
+	"chemplusx.com/midas/service"
 	"github.com/gin-gonic/gin"
 )
 
-// MedalAIController is the controller for the Medal AI service.
+// MIDASController is the controller for the MIDAS service.
 
-// MedalAIHandler handles the Medal AI service.
-func MedalAIHandler(c *gin.Context) {
+// MIDASHandler handles the MIDAS service.
+func MIDASHandler(c *gin.Context) {
 	// Parse the request
-	var req service.MedalAIRequest
+	var req service.MIDASRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

@@ -1,16 +1,16 @@
 package server
 
 import (
-	"chemplusx.com/medal-ai/controller"
+	"chemplusx.com/midas/controller"
 	"github.com/gin-gonic/gin"
-	// "chemplusx.com/medal-ai/neo4j"
+	// "chemplusx.com/midas/neo4j"
 )
 
 func InitRouter(r *gin.Engine) {
 
 	// Serve the OpenAPI specification and Swagger UI
 	r.StaticFile("/home", "./static/templates/home.html")
-	r.StaticFile("/medal-ai", "./static/templates/medal-ai.html")
+	r.StaticFile("/midas", "./static/templates/midas.html")
 	r.StaticFile("/source", "./static/templates/sources.html")
 	r.StaticFile("/about", "./static/templates/about.html")
 	r.StaticFile("/contact", "./static/templates/contact.html")
@@ -20,7 +20,7 @@ func InitRouter(r *gin.Engine) {
 	r.Static("/images", "./static/images")
 	r.Static("/css", "./static/css")
 
-	r.POST("/api/stream", controller.MedalAIHandler)
+	r.POST("/api/stream", controller.MIDASHandler)
 
 	// Use the custom OpenAPI request validator middleware in Gin
 	// r.Use(middlewares.OapiRequestValidatorWithGin(router))

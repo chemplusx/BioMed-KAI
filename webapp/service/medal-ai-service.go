@@ -8,8 +8,8 @@ import (
 	"strings"
 )
 
-// MedalAIRequest represents a request to the Medal AI service.
-type MedalAIRequest struct {
+// MIDASRequest represents a request to the MIDAS service.
+type MIDASRequest struct {
 	// The text to process
 	Text          string   `json:"text"`
 	Conversations []string `json:"conversations"`
@@ -17,15 +17,15 @@ type MedalAIRequest struct {
 }
 
 // Validate validates the request.
-func (r *MedalAIRequest) Validate() error {
+func (r *MIDASRequest) Validate() error {
 	if r.Text == "" {
 		return fmt.Errorf("text is required")
 	}
 	return nil
 }
 
-// MedalAIResponse represents a response from the Medal AI service.
-type MedalAIResponse struct {
+// MIDASResponse represents a response from the MIDAS service.
+type MIDASResponse struct {
 	// The text to process
 	Text string `json:"text"`
 }
@@ -64,12 +64,12 @@ var (
 	seed      = -1
 )
 
-// ProcessMedalAIRequest processes a Medal AI request.
-func ProcessMedalAIRequest(req MedalAIRequest) (MedalAIResponse, error) {
+// ProcessMIDASRequest processes a MIDAS request.
+func ProcessMIDASRequest(req MIDASRequest) (MIDASResponse, error) {
 	// Process the request
 	// t := llama.LLama
 
-	// return MedalAIResponse{
+	// return MIDASResponse{
 	// 	Text: strings.ToUpper(req.Text),
 	// }, nil
 
@@ -140,7 +140,7 @@ func ProcessMedalAIRequest(req MedalAIRequest) (MedalAIResponse, error) {
         `
 	input = strings.Replace(input, "$$prompt$$", text, -1)
 
-	resp := MedalAIResponse{
+	resp := MIDASResponse{
 		Text: strings.ToUpper(req.Text),
 	}
 	return resp, nil
