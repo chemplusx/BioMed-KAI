@@ -59,11 +59,12 @@ def custom_token_ban_logits_processor(token_ids, input_ids, logits):
 
 class LlamaCppModel:
     models = {
-            'llama-3.1': 'H:\\workspace\\NEXIS\\src\\models\\Meta-Llama-3-8B-Instruct.Q8_0.gguf',
-            'llama-2': 'H:\\workspace\\NEXIS\\src\\models\\Meta-Llama-3-8B-Instruct.Q8_0.gguf'
+            'llama-3': 'H:\\workspace\\NEXIS\\src\\models\\Meta-Llama-3-8B-Instruct.Q8_0.gguf',
+            'llama-3.1': 'H:\\workspace\\NEXIS\\src\\models\\Meta-Llama-3.1-8B-Instruct-Q8_0.gguf',
         }
     model_name = 'llama-3.1'
     def __init__(self, model_name='llama-3.1'):
+        print("Model Name: 1 ", model_name)
         self.model_name = model_name
         self.model = None
         self.initialized = False
@@ -78,14 +79,15 @@ class LlamaCppModel:
     def get_models(cls):
         return cls.models
 
-    @classmethod
     def load(self):
 
         Llama = llama_cpp_lib().Llama
         LlamaCache = llama_cpp_lib().LlamaCache
 
-        result = self()
+        result = self
         cache_capacity = 0
+        print("Model Name: ", self.model_name)
+        print("Model Path: ", self.models[self.model_name])
         params = {
             'model_path': self.models[self.model_name],
             'n_ctx': 4096*16,
@@ -269,7 +271,7 @@ class LlamaCppModel:
         can_yield = False
         for completion_chunk in completion_chunks:
             delta = completion_chunk["choices"][0]["text"]
-            print("output text: ", delta)
+            # print("output text: ", delta)
             # text = ""
             # if "content" in delta:
             #     text = delta["content"]
@@ -349,9 +351,9 @@ class LlamaCppModel:
                 
                 output1 += delta
                 yield delta
-            print("Output222222: ", output1)    
+            # print("Output222222: ", output1)    
             # return output1
-        print("Output: ", output)
+        # print("Output: ", output)
 
         # return output
 
