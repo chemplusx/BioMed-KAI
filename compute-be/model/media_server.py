@@ -6,10 +6,9 @@ import asyncio
 
 class MediaServer:
     def __init__(self):
-        self.model = LlamaCppModel('llama-3.1')
+        print("Calling - > ", LlamaCppModel.get_models())
         self.active_model = "llama-3.1"
-
-        self.model, _ = self.model.load()
+        self.model, _ = LlamaCppModel(self.active_model).load()
 
     async def handle_generate_response(self, data: Dict[str, Union[str, bool, List]], websocket: websockets.WebSocketServerProtocol):
         prompt = data.get("prompt", "")
@@ -27,7 +26,7 @@ class MediaServer:
             
             async for chunk in self.model.generate(prompt, chat_history):
                 await websocket.send(json.dumps({"type": "GENERATE_RESPONSE", "chunk": chunk}))
-                print(f"Sent chunk: {chunk}")
+                # print(f"Sent chunk: {chunk}")
                 await asyncio.sleep(0)
             await websocket.send(json.dumps({"type": "GENERATE_RESPONSE", "stream_end": True}))
             # else:

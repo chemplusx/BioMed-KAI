@@ -137,6 +137,56 @@
             color: #3498db;
             text-decoration: underline;
         }
+
+        .edit-button, .resend-button {
+            display: none;
+            position: absolute;
+            top: -10px;
+            background-color: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 50%;
+            padding: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .edit-button {
+            right: 40px;
+            color: black;
+        }
+        .resend-button {
+            right: 10px;
+            color: black;
+        }
+        .message:hover .edit-button,
+        .message:hover .resend-button {
+            display: block;
+        }
+        .edit-button:hover, .resend-button:hover {
+            background-color: #e2e8f0;
+        }
+        .new-chat-button {
+            position: fixed;
+            top: 154px;
+            right: 10px;
+            z-index: 1000;
+        }
+        .error-message {
+            background-color: #FEE2E2;
+            border: 1px solid #F87171;
+            color: #B91C1C;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .editable-message {
+            min-height: 24px;
+            padding: 4px;
+            border-radius: 4px;
+            outline: none;
+        }
+        .editable-message:focus {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
     </style>
 </head>
 
@@ -149,18 +199,18 @@
             <nav>
                 <ul class="space-y-4">
                     <li><a href="home"
-                            class="text-white font-semibold px-5 block py-2 bg-blue-600 rounded transition duration-300">Home</a>
+                            class="text-gray-300 px-5 block py-2 hover:bg-blue-600 rounded transition duration-300">Home</a>
                     </li>
                     <li><a href="midas"
-                            class="text-gray-300 px-5 block py-2 hover:bg-blue-600 rounded transition duration-300">MIDAS</a>
+                            class="text-white font-semibold px-5 block py-2 bg-blue-600 rounded transition duration-300">MIDAS</a>
                     </li>
                     <li><a href="source"
                             class="text-gray-300 px-5 block py-2 hover:bg-blue-600 rounded transition duration-300">Knowledge Graph</a></li>
                     <li><a href="about"
                             class="text-gray-300 px-5 block py-2 hover:bg-blue-600 rounded transition duration-300">About</a>
                     </li>
-                    <li><a href="contact"
-                            class="text-gray-300 px-5 block py-2 hover:bg-blue-600 rounded transition duration-300">Contact Us</a></li>
+                    <!-- <li><a href="contact"
+                            class="text-gray-300 px-5 block py-2 hover:bg-blue-600 rounded transition duration-300">Contact Us</a></li> -->
                 </ul>
             </nav>
         </div>
@@ -181,6 +231,9 @@
                 <h1 class="text-4xl md:text-5xl font-bold mb-4">Chat with MIDAS</h1>
             </div>
         </section>
+        <button id="new-chat" class="new-chat-button bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-full shadow-lg transition duration-300">
+            <i class="fas fa-plus mr-2"></i>New Chat
+        </button>
         <section class="flex-grow bg-gray-100 overflow-y-auto">
             <div id="chat-messages" class="p-6 space-y-4 relative z-10">
                 <!-- Chat messages will be inserted here -->
@@ -229,6 +282,11 @@
         const chatMessages = document.getElementById('chat-messages');
         const chatForm = document.getElementById('chat-form');
         const userInput = document.getElementById('user-input');
+        const newChatButton = document.getElementById('new-chat');
+
+        let messageIdCounter = 0;
+        let editingMessageId = null;
+        let chatHistory = [];
 
         marked.use({
             breaks: true,
@@ -247,26 +305,127 @@
             sendMessage();
         });
 
+        newChatButton.addEventListener('click', function() {
+            chatMessages.innerHTML = '';
+            chatHistory = [];
+            addMessage('ai', 'Welcome to a new chat! How can I assist you with precision medicine today?');
+        });
+
         function sendMessage() {
             const message = userInput.value.trim();
             if (message) {
-                addMessage('user', message);
+                if (editingMessageId !== null) {
+                    updateMessage(editingMessageId, 'user', message);
+                    editingMessageId = null;
+                } else {
+                    addMessage('user', message);
+                }
                 userInput.value = '';
                 streamResponse(message);
             }
         }
 
+        // async function streamResponse(message) {
+        //     const thinkingIndicator = addThinkingIndicator();
+
+        //     try {
+        //         responseTimeout = setTimeout(() => {
+        //             throw new Error('Response timeout');
+        //         }, 20000);
+        //         const response = await fetch('api/stream', {
+        //             method: 'POST',
+        //             headers: {
+        //                 'Content-Type': 'application/json',
+        //             },
+        //             body: JSON.stringify({ text: message, chatHistory: chatHistory }),
+        //         });
+
+        //         clearTimeout(responseTimeout);
+        //         const reader = response.body.getReader();
+        //         const decoder = new TextDecoder();
+
+        //         let aiMessageElement = addMessage('ai', '');
+        //         let fullResponse = '';
+
+        //         while (true) {
+        //             const { done, value } = await reader.read();
+
+        //             if (done) {
+        //                 console.log("Stream complete");
+        //                 break;
+        //             }
+
+        //             const chunk = decoder.decode(value);
+        //             const lines = chunk.split('\n');
+        //             let eor = false;
+        //             removeThinkingIndicator(thinkingIndicator);
+        //             for (const line of lines) {
+        //                 if (line.startsWith('data:')) {
+        //                     const jsonStr = line.slice(5).trim();
+        //                     try {
+        //                         if (jsonStr === '<EOR>') {
+        //                             eor = true;
+        //                             break;
+        //                         }
+        //                         const data = JSON.parse(jsonStr);
+        //                         fullResponse += data.chunk || '';
+        //                         aiMessageElement.querySelector('.message-content').innerHTML = marked.parse(fullResponse);
+        //                         hljs.highlightAll();
+        //                         chatMessages.scrollTop = chatMessages.scrollHeight;
+        //                         // const data = JSON.parse(jsonStr);
+        //                         // fullResponse += data.chunk || '';
+        //                         // aiMessageElement.querySelector('.message-content').innerHTML = marked.parse(fullResponse);
+        //                         // // aiMessageElement.innerHTML = marked.parse(fullResponse);
+        //                         // hljs.highlightAll();
+        //                         // chatMessages.scrollTop = chatMessages.scrollHeight;
+        //                     } catch (e) {
+        //                         console.error('Error parsing JSON:', e);
+        //                     }
+        //                 }
+        //             }
+        //             if (eor) {
+        //                 break;
+        //             }
+        //         }
+        //         chatHistory.push({ role: 'user', content: message });
+        //         chatHistory.push({ role: 'assistant', content: fullResponse });
+        //     } catch (error) {
+        //         console.error('Streaming failed:', error);
+        //         removeThinkingIndicator(thinkingIndicator);
+        //         showErrorMessage('Sorry, an error occurred while processing your request. Please try again.');
+        //     } finally {
+        //         removeThinkingIndicator(thinkingIndicator);
+        //     }
+        // }
+
         async function streamResponse(message) {
             const thinkingIndicator = addThinkingIndicator();
+            let timeoutOccurred = false;
+            let timeoutId;
 
             try {
-                const response = await fetch('api/stream', {
+                const timeoutPromise = new Promise((_, reject) => {
+                    timeoutId = setTimeout(() => {
+                        timeoutOccurred = true;
+                        reject(new Error('Response timeout'));
+                    }, 20000);
+                });
+
+                const fetchPromise = fetch('api/stream', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ text: message }),
+                    body: JSON.stringify({ text: message, chatHistory: chatHistory }),
                 });
+
+                const response = await Promise.race([fetchPromise, timeoutPromise]);
+
+                if (timeoutOccurred) {
+                    throw new Error('Response timeout');
+                }
+
+                clearTimeout(timeoutId);
 
                 const reader = response.body.getReader();
                 const decoder = new TextDecoder();
@@ -296,7 +455,7 @@
                                 }
                                 const data = JSON.parse(jsonStr);
                                 fullResponse += data.chunk || '';
-                                aiMessageElement.innerHTML = marked.parse(fullResponse);
+                                aiMessageElement.querySelector('.message-content').innerHTML = marked.parse(fullResponse);
                                 hljs.highlightAll();
                                 chatMessages.scrollTop = chatMessages.scrollHeight;
                             } catch (e) {
@@ -308,27 +467,120 @@
                         break;
                     }
                 }
+                chatHistory.push({ role: 'user', content: message });
+                chatHistory.push({ role: 'assistant', content: fullResponse });
             } catch (error) {
                 console.error('Streaming failed:', error);
-                addMessage('ai', 'Sorry, an error occurred while processing your request.');
+                if (timeoutOccurred) {
+                    showErrorMessage('Sorry, the response timed out. Please try again.');
+                } else {
+                    showErrorMessage('Sorry, an error occurred while processing your request. Please try again.');
+                }
             } finally {
+                clearTimeout(timeoutId);
                 removeThinkingIndicator(thinkingIndicator);
             }
         }
 
-        function addMessage(sender, text) {
+        function addMessage(sender, text, id = null) {
+            const messageId = id !== null ? id : messageIdCounter++;
             const messageDiv = document.createElement('div');
-            messageDiv.className = `flex ${sender === 'user' ? 'justify-end' : 'justify-start'} message-appear`;
+            messageDiv.className = `flex ${sender === 'user' ? 'justify-end' : 'justify-start'} message-appear message relative`;
+            messageDiv.dataset.id = messageId;
+            
             const innerDiv = document.createElement('div');
             innerDiv.className = `${sender === 'user' ? 'bg-blue-600 text-white' : 'bg-white text-gray-800'} rounded-lg p-3 shadow-md markdown-content`;
-            innerDiv.innerHTML = sender === 'user' ? text : marked.parse(text);
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            contentDiv.innerHTML = sender === 'user' ? text : marked.parse(text);
+            
+            if (sender === 'user') {
+                contentDiv.contentEditable = true;
+                contentDiv.className += ' editable-message';
+                contentDiv.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        this.blur();
+                        handleEdit(messageId, this.innerText);
+                    }
+                });
+                
+                const editButton = document.createElement('button');
+                editButton.innerHTML = '<i class="fas fa-edit"></i>';
+                editButton.className = 'edit-button';
+                editButton.addEventListener('click', () => {
+                    contentDiv.focus();
+                    // Place cursor at the end of the content
+                    const range = document.createRange();
+                    range.selectNodeContents(contentDiv);
+                    range.collapse(false);
+                    const selection = window.getSelection();
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                });
+                
+                const resendButton = document.createElement('button');
+                resendButton.innerHTML = '<i class="fas fa-redo"></i>';
+                resendButton.className = 'resend-button';
+                resendButton.addEventListener('click', () => resendMessage(messageId));
+
+                innerDiv.appendChild(editButton);
+                innerDiv.appendChild(resendButton);
+            }
+            
+            innerDiv.appendChild(contentDiv);
+            messageDiv.appendChild(innerDiv);
+            chatMessages.appendChild(messageDiv);
+            
             if (sender === 'ai') {
                 hljs.highlightAll();
             }
-            messageDiv.appendChild(innerDiv);
-            chatMessages.appendChild(messageDiv);
+            
             chatMessages.scrollTop = chatMessages.scrollHeight;
             return innerDiv;
+        }
+
+        function handleEdit(id, newText) {
+            updateMessage(id, 'user', newText);
+            resendMessage(id);
+        }
+
+        function updateMessage(id, sender, text) {
+            const messageDiv = document.querySelector(`.message[data-id="${id}"]`);
+            const contentDiv = messageDiv.querySelector('.message-content');
+            contentDiv.innerHTML = sender === 'user' ? text : marked.parse(text);
+            if (sender === 'ai') {
+                hljs.highlightAll();
+            }
+            // Update chat history
+            const messageIndex = chatHistory.findIndex(msg => msg.role === 'user' && msg.content === contentDiv.textContent.trim());
+            if (messageIndex !== -1) {
+                chatHistory[messageIndex].content = text;
+                // Remove all messages after this one
+                chatHistory.splice(messageIndex + 1);
+            }
+        }
+
+        function resendMessage(id) {
+            const messageDiv = document.querySelector(`.message[data-id="${id}"]`);
+            const contentDiv = messageDiv.querySelector('.message-content');
+            const message = contentDiv.innerText.trim();
+            
+            // Remove all messages after this one
+            let nextSibling = messageDiv.nextElementSibling;
+            while (nextSibling) {
+                chatMessages.removeChild(nextSibling);
+                nextSibling = messageDiv.nextElementSibling;
+            }
+            
+            // Update chat history
+            const messageIndex = chatHistory.findIndex(msg => msg.role === 'user' && msg.content === contentDiv.textContent.trim());
+            if (messageIndex !== -1) {
+                chatHistory.splice(messageIndex + 1);
+            }
+            
+            streamResponse(message);
         }
 
         function addThinkingIndicator() {
@@ -354,6 +606,14 @@
             if (indicator && indicator.parentNode) {
                 indicator.parentNode.removeChild(indicator);
             }
+        }
+
+        function showErrorMessage(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.textContent = message;
+            chatMessages.appendChild(errorDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
         // Add event listeners for sample inputs
