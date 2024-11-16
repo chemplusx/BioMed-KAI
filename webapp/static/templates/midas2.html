@@ -7,16 +7,16 @@
     <title>BioMed-KAI - Immersive Precision Medicine Chat</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/2.8.2/alpine.js" defer></script>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
-    <link href="css/styles.css" rel="stylesheet">
     <style>
+        /* Base styles */
         html,
         body {
             height: 100%;
+            background-color: #0F172A;
         }
 
         body {
@@ -30,14 +30,76 @@
             flex-direction: column;
         }
 
+        /* Wave Animation Styles */
+        .wave-header {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(45deg, #0F172A, #1E3A8A);
+            /* padding-bottom: 100px; */
+        }
+
+        .wave-container {
+            position: absolute;
+            width: 200%;
+            height: 100%;
+            bottom: 0;
+            left: 0;
+            animation: wave-move 20s linear infinite;
+            transform: translateZ(0);
+        }
+
+        .wave {
+            position: relative;
+            float: left;
+            width: 50%;
+            height: 100%;
+            background-repeat: repeat-x;
+            background-position: 0 bottom;
+        }
+
+        .wave-container-1 {
+            opacity: 0.3;
+            animation-duration: 18s;
+        }
+
+        .wave-container-1 .wave {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 88.7'%3E%3Cpath d='M800 56.9c-155.5 0-204.9-50-405.5-49.9-200 0-250 49.9-394.5 49.9v31.8h800v-.2-31.6z' fill='%232563EB'/%3E%3C/svg%3E");
+        }
+
+        .wave-container-2 {
+            opacity: 0.6;
+            animation-duration: 15s;
+        }
+
+        .wave-container-2 .wave {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 88.7'%3E%3Cpath d='M800 56.9c-155.5 0-204.9-50-405.5-49.9-200 0-250 49.9-394.5 49.9v31.8h800v-.2-31.6z' fill='%231D4ED8'/%3E%3C/svg%3E");
+        }
+
+        .wave-container-3 {
+            opacity: 0.9;
+            animation-duration: 12s;
+        }
+
+        .wave-container-3 .wave {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 88.7'%3E%3Cpath d='M800 56.9c-155.5 0-204.9-50-405.5-49.9-200 0-250 49.9-394.5 49.9v31.8h800v-.2-31.6z' fill='%231E40AF'/%3E%3C/svg%3E");
+        }
+
+        @keyframes wave-move {
+            0% {
+                transform: translateX(0) translateZ(0);
+            }
+
+            100% {
+                transform: translateX(-50%) translateZ(0);
+            }
+        }
+
+        /* Chat-specific styles */
         .chat-container {
             flex: 1;
             overflow-y: auto;
-        }
-
-        .chat-container {
             height: calc(100vh - 64px - 360px);
-            /* Adjusted to accommodate sample inputs */
+            background-color: #1E293B;
         }
 
         .message-appear {
@@ -72,140 +134,137 @@
             }
         }
 
+        /* Enhanced UI Elements */
         .sample-input {
             transition: all 0.3s ease;
+            background-color: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(59, 130, 246, 0.3);
         }
 
         .sample-input:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background-color: rgba(30, 41, 59, 0.8);
+            border-color: rgba(59, 130, 246, 0.6);
         }
 
-        .markdown-content h1 {
-            font-size: 1.5em;
-            font-weight: bold;
-            margin-top: 1em;
-            margin-bottom: 0.5em;
-        }
-
-        .markdown-content h2 {
-            font-size: 1.3em;
-            font-weight: bold;
-            margin-top: 1em;
-            margin-bottom: 0.5em;
-        }
-
-        .markdown-content h3 {
-            font-size: 1.1em;
-            font-weight: bold;
-            margin-top: 1em;
-            margin-bottom: 0.5em;
-        }
-
-        .markdown-content p {
-            margin-bottom: 0.5em;
-        }
-
-        .markdown-content ul,
-        .markdown-content ol {
-            margin-left: 1.5em;
-            margin-bottom: 0.5em;
+        .markdown-content {
+            color: #E5E7EB;
         }
 
         .markdown-content code {
-            background-color: #f0f0f0;
-            padding: 0.2em 0.4em;
-            border-radius: 3px;
-            font-family: monospace;
+            background-color: rgba(30, 41, 59, 0.5);
+            color: #E5E7EB;
         }
 
         .markdown-content pre {
-            background-color: #f0f0f0;
-            padding: 1em;
-            border-radius: 5px;
-            overflow-x: auto;
+            background-color: rgba(30, 41, 59, 0.5);
+            color: #E5E7EB;
         }
 
-        .markdown-content blockquote {
-            border-left: 4px solid #ccc;
-            padding-left: 1em;
-            margin-left: 0;
-            font-style: italic;
-        }
-
-        .markdown-content a {
-            color: #3498db;
-            text-decoration: underline;
-        }
-
-        .edit-button,
+        /* .edit-button,
         .resend-button {
-            display: none;
-            position: absolute;
-            top: -10px;
-            background-color: white;
-            border: 1px solid #e2e8f0;
-            border-radius: 50%;
-            padding: 5px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .edit-button {
-            right: 40px;
-            color: black;
-        }
-
-        .resend-button {
-            right: 10px;
-            color: black;
-        }
-
-        .message:hover .edit-button,
-        .message:hover .resend-button {
-            display: block;
+            background-color: rgba(30, 41, 59, 0.5);
+            color: #E5E7EB;
         }
 
         .edit-button:hover,
         .resend-button:hover {
-            background-color: #e2e8f0;
+            background-color: rgba(59, 130, 246, 0.3);
+        } */
+
+        .edit-button, .resend-button {
+            position: absolute;
+            background-color: transparent; /* Remove the background */
+            color: #E5E7EB; /* Light gray color for the icon */
+            border: none; /* Remove any border */
+            font-size: 1rem; /* Adjust icon size if needed */
+            padding: 0.25rem; /* Add padding for spacing */
+            transition: color 0.3s ease; /* Smooth color transition */
         }
 
-        .new-chat-button {
-            position: fixed;
-            top: 154px;
-            right: 10px;
-            z-index: 1000;
+        .edit-button {
+            margin: -2.8rem 0px 0px 0px;
         }
 
-        .error-message {
-            background-color: #FEE2E2;
-            border: 1px solid #F87171;
-            color: #B91C1C;
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 10px;
+        .resend-button {
+            margin: -2.8rem 0px 0px 25px;
         }
 
-        .editable-message {
-            min-height: 24px;
-            padding: 4px;
-            border-radius: 4px;
-            outline: none;
+        .edit-button:hover, .resend-button:hover {
+            color: #60A5FA; /* Light blue color on hover */
+            cursor: pointer; /* Show pointer cursor on hover */
         }
 
-        .editable-message:focus {
-            background-color: rgba(255, 255, 255, 0.1);
+        .sidebar {
+            background-color: #0F172A;
         }
+
+        .glow-text {
+            text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+        }
+
+
+
+        /* Styling for AI response markdown content */
+.markdown-content {
+    color: #E5E7EB; /* Light text color for readability */
+    font-size: 1rem;
+    line-height: 1.6;
+    padding: 0.5rem;
+}
+
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3 {
+    color: #93C5FD; /* Lighter blue for headers */
+    font-weight: 600;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.markdown-content h1 { font-size: 1.5rem; }
+.markdown-content h2 { font-size: 1.25rem; }
+.markdown-content h3 { font-size: 1.1rem; }
+
+.markdown-content p {
+    margin-bottom: 1rem;
+    font-size: 1rem;
+}
+
+.markdown-content ul, .markdown-content ol {
+    margin-left: 1.5rem;
+    margin-bottom: 1rem;
+    list-style-type: disc;
+}
+
+.markdown-content code {
+    background-color: rgba(30, 41, 59, 0.8);
+    color: #F8FAFC;
+    padding: 2px 4px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+.markdown-content pre {
+    background-color: #1E293B;
+    color: #F8FAFC;
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
     </style>
 </head>
 
-<body class="font-sans text-gray-800 flex flex-col min-h-screen bg-gray-100" x-data="{ sidebarOpen: false }">
-
-    <div class="sidebar fixed top-0 left-0 h-full w-64 text-white shadow-lg z-50 transform transition-transform duration-300 ease-in-out"
+<body class="bg-custom-dark text-gray-100" x-data="{ sidebarOpen: false }">
+    <!-- Sidebar -->
+    <div class="sidebar fixed top-0 left-0 h-full w-64 transform transition-transform duration-300 ease-in-out z-50"
         :class="{ 'translate-x-0': sidebarOpen, '-translate-x-full': !sidebarOpen }">
         <div class="p-6">
-            <img src="static/midas-logo.png" alt="BioMed-KAI Logo" class="h-30 mb-8 filter invert">
+            <img src="static/BioMed-KAI-logo.png" alt="BioMed-KAI Logo" class="h-30 mb-8 filter invert">
             <nav>
                 <ul class="space-y-4">
                     <li><a href="home"
@@ -220,8 +279,6 @@
                     <li><a href="about"
                             class="text-gray-300 px-5 block py-2 hover:bg-blue-600 rounded transition duration-300">About</a>
                     </li>
-                    <!-- <li><a href="contact"
-                            class="text-gray-300 px-5 block py-2 hover:bg-blue-600 rounded transition duration-300">Contact Us</a></li> -->
                 </ul>
             </nav>
         </div>
@@ -230,9 +287,21 @@
     <div class="overlay fixed inset-0 bg-black opacity-50 z-40" x-show="sidebarOpen" @click="sidebarOpen = false"></div>
 
     <main class="flex-grow">
-        <section class="animated-bg text-white py-10">
-            <div class="sidebar-toggle absolute top-4 left-4 z-50" :class="{ 'active': sidebarOpen }"
-                @click="sidebarOpen = !sidebarOpen">
+        <section class="wave-header text-white py-16">
+            <div class="wave-container wave-container-1">
+                <div class="wave"></div>
+                <div class="wave"></div>
+            </div>
+            <div class="wave-container wave-container-2">
+                <div class="wave"></div>
+                <div class="wave"></div>
+            </div>
+            <div class="wave-container wave-container-3">
+                <div class="wave"></div>
+                <div class="wave"></div>
+            </div>
+
+            <div class="sidebar-toggle absolute top-4 left-4 z-50" @click="sidebarOpen = !sidebarOpen">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="3" y1="12" x2="21" y2="12"></line>
@@ -240,46 +309,46 @@
                     <line x1="3" y1="18" x2="21" y2="18"></line>
                 </svg>
             </div>
-            <div class="container mx-auto px-6 text-center">
-                <h1 class="text-4xl md:text-5xl font-bold mb-4">Chat with BioMed-KAI</h1>
+            <div class="container mx-auto px-6 text-center relative z-10">
+                <h1 class="text-5xl md:text-6xl font-bold mb-4 glow-text">BioMed-KAI Chat</h1>
+                <p class="text-2xl mb-8 text-blue-400 glow-text">Your AI-Powered Precision Medicine Assistant</p>
             </div>
         </section>
+
         <button id="new-chat"
-            class="new-chat-button bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-full shadow-lg transition duration-300">
+            class="new-chat-button bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full shadow-lg transition duration-300"
+            style="position:sticky; left:100%; width: 8rem; margin: 1rem;">
             <i class="fas fa-plus mr-2"></i>New Chat
         </button>
-        <section class="flex-grow bg-gray-100 overflow-y-auto">
+
+        <section class="flex-grow bg-gray-900">
             <div id="chat-messages" class="p-6 space-y-4 relative z-10">
                 <!-- Chat messages will be inserted here -->
             </div>
         </section>
 
-        <section class="bg-white shadow-md py-4">
+        <section class="bg-gray-800 shadow-lg py-6">
             <div class="container mx-auto px-6">
-                <div class="recommendation-section grid grid-cols-2 gap-4 mb-4">
-                    <div
-                        class="sample-input bg-gray-200 text-gray-700 rounded-lg p-3 cursor-pointer hover:bg-gray-300 text-sm">
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div class="sample-input text-gray-300 rounded-lg p-3 cursor-pointer text-sm">
                         What are the latest advancements in cancer immunotherapy?
                     </div>
-                    <div
-                        class="sample-input bg-gray-200 text-gray-700 rounded-lg p-3 cursor-pointer hover:bg-gray-300 text-sm">
+                    <div class="sample-input text-gray-300 rounded-lg p-3 cursor-pointer text-sm">
                         How does pharmacogenomics influence drug efficacy?
                     </div>
-                    <div
-                        class="sample-input bg-gray-200 text-gray-700 rounded-lg p-3 cursor-pointer hover:bg-gray-300 text-sm">
+                    <div class="sample-input text-gray-300 rounded-lg p-3 cursor-pointer text-sm">
                         Can you explain the role of biomarkers in precision medicine?
                     </div>
-                    <div
-                        class="sample-input bg-gray-200 text-gray-700 rounded-lg p-3 cursor-pointer hover:bg-gray-300 text-sm">
+                    <div class="sample-input text-gray-300 rounded-lg p-3 cursor-pointer text-sm">
                         What are the ethical considerations in genetic testing?
                     </div>
                 </div>
                 <form id="chat-form" class="flex items-center">
                     <input type="text" id="user-input"
-                        class="flex-grow px-4 py-2 border rounded-l-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        class="flex-grow px-4 py-3 bg-gray-700 text-white border-gray-600 rounded-l-full focus:outline-none focus:ring-2 focus:ring-blue-500"
                         placeholder="Ask BioMed-KAI about precision medicine...">
                     <button type="submit"
-                        class="bg-blue-600 text-white px-6 py-2 rounded-r-full hover:bg-blue-700 transition duration-300 flex items-center">
+                        class="bg-blue-600 text-white px-8 py-3 rounded-r-full hover:bg-blue-700 transition duration-300 flex items-center">
                         <span class="mr-2">Send</span>
                         <i class="fas fa-paper-plane"></i>
                     </button>
@@ -287,6 +356,13 @@
             </div>
         </section>
     </main>
+
+    <footer class="bg-gray-800 text-gray-400 py-6">
+        <div class="container mx-auto px-6 text-center">
+            <p>&copy; 2024 BioMed-KAI. Empowering Precision Medicine with Advanced AI and Dynamic Knowledge Graphs. All
+                rights reserved.</p>
+        </div>
+    </footer>
 
     <!-- <footer class="bg-white shadow-md py-4 sticky bottom-0 z-50">
         
@@ -297,7 +373,6 @@
         const chatForm = document.getElementById('chat-form');
         const userInput = document.getElementById('user-input');
         const newChatButton = document.getElementById('new-chat');
-        const recommendationSec = document.querySelector('.recommendation-section');
 
         let messageIdCounter = 0;
         let editingMessageId = null;
@@ -477,36 +552,16 @@
                                     break;
                                 }
                                 const data = JSON.parse(jsonStr);
-                                if (!data.chunk.includes('$$-+Recommendations+-$$')) {
-                                    if (data.chunk && data.chunk.length > 0 && fullResponse.endsWith(data.chunk) && fullResponse.length > data.chunk.length) {
-                                        // this means repeated chunks are being sent
-                                        // so we need to remove the last chunk from the full response
-                                        fullResponse = fullResponse.slice(0, -data.chunk.length);
-                                    }
-                                    fullResponse += data.chunk || '';
-                                    aiMessageElement.querySelector('.message-content').innerHTML = marked.parse(fullResponse);
-                                    hljs.highlightAll();
-                                    chatMessages.scrollTop = chatMessages.scrollHeight;
-                                }else{
-                                    // this means we have reached the end of the response
-                                    // so we need to break the loop
-                                    recommendations = data.chunk.split('$$-+Recommendations+-$$')[1];
-                                    recArray = JSON.parse(recommendations);
-                                    
-                                    recArray.forEach(rec => {
-                                        const recDiv = document.createElement('div');
-                                        recDiv.className = 'sample-input bg-gray-200 text-gray-700 rounded-lg p-3 cursor-pointer hover:bg-gray-300 text-sm';
-                                        recDiv.textContent = rec;
-                                        recDiv.addEventListener('click', function () {
-                                            userInput.value = this.textContent.trim();
-                                            sendMessage();
-                                        });
-                                        // remove the current contents of the recommendation section
-                                        recommendationSec.innerHTML = '';
-                                        recommendationSec.appendChild(recDiv);
-                                    });
-
+                                
+                                if (data.chunk && data.chunk.length > 0 && fullResponse.endsWith(data.chunk) && fullResponse.length > data.chunk.length) {
+                                    // this means repeated chunks are being sent
+                                    // so we need to remove the last chunk from the full response
+                                    fullResponse = fullResponse.slice(0, -data.chunk.length);
                                 }
+                                fullResponse += data.chunk || '';
+                                aiMessageElement.querySelector('.message-content').innerHTML = marked.parse(fullResponse);
+                                hljs.highlightAll();
+                                chatMessages.scrollTop = chatMessages.scrollHeight;
                             } catch (e) {
                                 console.error('Error parsing JSON:', e);
                             }
@@ -532,20 +587,21 @@
             }
         }
 
+
         function addMessage(sender, text, id = null) {
+
             const messageId = id !== null ? id : messageIdCounter++;
             const messageDiv = document.createElement('div');
             messageDiv.className = `flex ${sender === 'user' ? 'justify-end' : 'justify-start'} message-appear message relative`;
             messageDiv.dataset.id = messageId;
-            messageDiv.style = sender === 'user' ? 'margin-left: auto;' : 'margin-left: 2.5rem;';
 
             const innerDiv = document.createElement('div');
-            innerDiv.className = `${sender === 'user' ? 'bg-blue-600 text-white' : 'bg-white text-gray-800'} rounded-lg p-3 shadow-md markdown-content`;
+            innerDiv.className = `${sender === 'user' ? 'bg-blue-600 text-white' : 'text-gray-800'} rounded-lg p-3 shadow-md markdown-content`;
 
             const contentDiv = document.createElement('div');
             contentDiv.className = 'message-content';
             contentDiv.innerHTML = sender === 'user' ? text : marked.parse(text);
-            contentDiv.style = sender === 'user' ? '' : "display: inline-block;padding: 0.5rem;border-radius: 0.5rem;width: calc(100% - 50px);";
+            contentDiv.style = sender === 'user' ? '' : "background: rgba(17, 24, 39, var(--tw-bg-opacity));display: inline-block;padding: 0.5rem;border-radius: 0.5rem;width: calc(100% - 50px);";
 
             // Use custom images for user and AI icons
 
@@ -586,14 +642,14 @@
                 const icon = document.createElement('img');
                 icon.src = 'static/ai-animated.gif'; // Replace with actual paths
                 icon.alt = 'AI Icon';
-                icon.className = 'w-12 h-12 rounded-full'; // Adjust width and height as needed
-                icon.style = 'position: absolute;margin-left: -4rem;float: inline-start;';
+                icon.className = 'w-8 h-8 rounded-full'; // Adjust width and height as needed
+                icon.style = 'display: inline;margin-right: 10px; margin: 1.5rem 10px 0 0; float: inline-start;';
 
                 // aiMessageElement.querySelector('.message-content').appendChild(icon);
                 innerDiv.appendChild(icon);
             }
 
-
+            
             innerDiv.appendChild(contentDiv);
             messageDiv.appendChild(innerDiv);
             chatMessages.appendChild(messageDiv);
@@ -651,27 +707,71 @@
         function addThinkingIndicator() {
             const indicatorDiv = document.createElement('div');
             indicatorDiv.className = 'flex justify-start message-appear';
-            indicatorDiv.innerHTML = `
-                <div class="bg-gray-200 text-gray-600 rounded-lg p-3 shadow-md flex items-center">
-                    <span class="mr-2">BioMed-KAI is thinking</span>
-                    <div class="flex space-x-1">
-                        <div class="w-2 h-2 bg-gray-600 rounded-full pulse"></div>
-                        <div class="w-2 h-2 bg-gray-600 rounded-full pulse" style="animation-delay: 0.2s"></div>
-                        <div class="w-2 h-2 bg-gray-600 rounded-full pulse" style="animation-delay: 0.4s"></div>
-                    </div>
-                </div>
-            `;
+
+            // Messages to display in sequence
+            const messages = ["BioMed-KAI is thinking", "Verifying accuracy", "Performing final analysis"];
+            let messageIndex = 0;
+
+            // Create the HTML structure for the indicator
+            const messageText = document.createElement('span');
+            messageText.className = 'mr-2';
+            messageText.textContent = messages[messageIndex];
+
+            const dotsContainer = document.createElement('div');
+            dotsContainer.className = 'flex space-x-1';
+            for (let i = 0; i < 3; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'w-2 h-2 bg-gray-600 rounded-full pulse';
+                dot.style.animationDelay = `${i * 0.2}s`;
+                dotsContainer.appendChild(dot);
+            }
+
+            // Append text and dots to indicator div
+            indicatorDiv.appendChild(messageText);
+            indicatorDiv.appendChild(dotsContainer);
             chatMessages.appendChild(indicatorDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            // Update message every 2 seconds
+            thinkingInterval = setInterval(() => {
+                messageIndex = (messageIndex + 1) % messages.length;
+                messageText.textContent = messages[messageIndex];
+            }, 2000);
+
             return indicatorDiv;
         }
 
         function removeThinkingIndicator(indicator) {
-            console.log('Removing thinking indicator');
+            clearInterval(thinkingInterval); // Stop the interval
             if (indicator && indicator.parentNode) {
                 indicator.parentNode.removeChild(indicator);
             }
         }
+
+        // function addThinkingIndicator() {
+        //     const indicatorDiv = document.createElement('div');
+        //     indicatorDiv.className = 'flex justify-start message-appear';
+        //     indicatorDiv.innerHTML = `
+        //         <div class="bg-gray-200 text-gray-600 rounded-lg p-3 shadow-md flex items-center">
+        //             <span class="mr-2">BioMed-KAI is thinking</span>
+        //             <div class="flex space-x-1">
+        //                 <div class="w-2 h-2 bg-gray-600 rounded-full pulse"></div>
+        //                 <div class="w-2 h-2 bg-gray-600 rounded-full pulse" style="animation-delay: 0.2s"></div>
+        //                 <div class="w-2 h-2 bg-gray-600 rounded-full pulse" style="animation-delay: 0.4s"></div>
+        //             </div>
+        //         </div>
+        //     `;
+        //     chatMessages.appendChild(indicatorDiv);
+        //     chatMessages.scrollTop = chatMessages.scrollHeight;
+        //     return indicatorDiv;
+        // }
+
+        // function removeThinkingIndicator(indicator) {
+        //     console.log('Removing thinking indicator');
+        //     if (indicator && indicator.parentNode) {
+        //         indicator.parentNode.removeChild(indicator);
+        //     }
+        // }
 
         function showErrorMessage(message) {
             const errorDiv = document.createElement('div');

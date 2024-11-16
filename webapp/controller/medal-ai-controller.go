@@ -12,6 +12,9 @@ import (
 // MIDASController is the controller for the MIDAS service.
 
 // MIDASHandler handles the MIDAS service.
+
+var WS *service.Service
+
 func MIDASHandler(c *gin.Context) {
 	// Parse the request
 	var req service.MIDASRequest
@@ -31,16 +34,30 @@ func MIDASHandler(c *gin.Context) {
 	c.Writer.Header().Set("Content-Type", "text/event-stream")
 	c.Writer.Header().Set("Cache-Control", "no-cache")
 	c.Writer.Header().Set("Connection", "keep-alive")
-	var respChan = make(chan string)
-	go service.Send("generate", req.Text, func(response string, err bool) {
-		log.Println("Sending response:", response)
+	var respChan = make(chan string, 100)
+
+	log.Println("Received request:", req)
+	// Use the service
+	go WS.Send("generate", req, func(response string, done bool) {
+		if done {
+			log.Println("Stream complete")
+			return
+		}
 		respChan <- response
 	})
+
+	// go service.Send("generate", req.Text, func(response string, err bool) {
+	// 	// log.Println("Sending response:", response)
+	// 	respChan <- response
+	// })
 
 	c.Stream(func(w io.Writer) bool {
 		// Generate and send data based on the request
 		response := <-respChan
-		c.SSEvent("message", response)
+		resp := map[string]interface{}{
+			"chunk": response,
+		}
+		c.SSEvent("message", resp)
 		c.Writer.Flush()
 		// if err != nil {
 		// 	log.Printf("Error generating response: %v", err)

@@ -10,7 +10,9 @@ func InitRouter(r *gin.Engine) {
 
 	// Serve the OpenAPI specification and Swagger UI
 	r.StaticFile("/home", "./static/templates/home.html")
+	r.StaticFile("/home2", "./static/templates/home2.html")
 	r.StaticFile("/midas", "./static/templates/midas.html")
+	r.StaticFile("/midas2", "./static/templates/midas2.html")
 	r.StaticFile("/source", "./static/templates/sources.html")
 	r.StaticFile("/about", "./static/templates/about.html")
 	r.StaticFile("/contact", "./static/templates/contact.html")

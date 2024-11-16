@@ -4,12 +4,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MIDAS - Revolutionizing Precision Medicine with Advanced Gen-AI</title>
+    <title>BioMed-KAI - Revolutionizing Precision Medicine with Advanced Gen-AI</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <link href="css/styles.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/2.8.2/alpine.js" defer></script>
     <style>
-        
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .content-wrapper {
+            flex: 1;
+        }
+
+        .bottom-cta {
+            margin-top: auto;
+        }
     </style>
 </head>
 
@@ -18,17 +36,18 @@
     <div class="sidebar fixed top-0 left-0 h-full w-64 text-white shadow-lg z-50 transform transition-transform duration-300 ease-in-out"
         :class="{ 'translate-x-0': sidebarOpen, '-translate-x-full': !sidebarOpen }">
         <div class="p-6">
-            <img src="static/midas-logo.png" alt="MIDAS Logo" class="h-30 mb-8 filter invert">
+            <img src="static/midas-logo.png" alt="BioMed-KAI Logo" class="h-30 mb-8 filter invert">
             <nav>
                 <ul class="space-y-4">
                     <li><a href="home"
                             class="text-white font-semibold px-5 block py-2 bg-blue-600 rounded transition duration-300">Home</a>
                     </li>
                     <li><a href="midas"
-                            class="text-gray-300 px-5 block py-2 hover:bg-blue-600 rounded transition duration-300">MIDAS</a>
+                            class="text-gray-300 px-5 block py-2 hover:bg-blue-600 rounded transition duration-300">BioMed-KAI</a>
                     </li>
                     <li><a href="source"
-                            class="text-gray-300 px-5 block py-2 hover:bg-blue-600 rounded transition duration-300">Knowledge Graph</a></li>
+                            class="text-gray-300 px-5 block py-2 hover:bg-blue-600 rounded transition duration-300">Knowledge
+                            Graph</a></li>
                     <li><a href="about"
                             class="text-gray-300 px-5 block py-2 hover:bg-blue-600 rounded transition duration-300">About</a>
                     </li>
@@ -42,120 +61,130 @@
     <div class="overlay fixed inset-0 bg-black opacity-50 z-40" x-show="sidebarOpen" @click="sidebarOpen = false"></div>
 
     <main class="flex-grow">
-        <section class="animated-bg text-white py-10">
-            <div class="sidebar-toggle absolute top-4 left-4 z-50" :class="{ 'active': sidebarOpen }" @click="sidebarOpen = !sidebarOpen">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="3" y1="12" x2="21" y2="12"></line>
-                    <line x1="3" y1="6" x2="21" y2="6"></line>
-                    <line x1="3" y1="18" x2="21" y2="18"></line>
-                </svg>
-            </div>
-            <div class="container mx-auto px-6 text-center">
-                <h1 class="text-5xl md:text-6xl font-bold mb-4">Welcome to MIDAS</h1>
-                <p class="text-2xl mb-8">Medical Intelligence Driven Assistance System
-                </p>
-                <a href="#learn-more"
-                    class="bg-white text-blue-600 font-bold py-3 px-8 rounded-full hover:bg-blue-100 transition duration-300">Discover
-                    More</a>
-            </div>
-        </section>
+        <div class="content-wrapper">
+            <section class="animated-bg text-white py-10">
+                <div class="sidebar-toggle absolute top-4 left-4 z-50" :class="{ 'active': sidebarOpen }"
+                    @click="sidebarOpen = !sidebarOpen">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </div>
+                <div class="container mx-auto px-6 text-center">
+                    <h1 class="text-5xl md:text-6xl font-bold mb-4">BioMed-KAI </h1>
+                    <p class="text-3xl font-bold mb-8">(Biomedicine Knowledge-Aided Intelligence)</p>
+                    <p class="text-2xl mb-8">Enhancing Precision Medicine with AI-Driven Insights and Knowledge Integration
+                    </p>
 
-        <section id="learn-more" class="py-20 bg-gray-100">
-            <div class="container mx-auto px-6">
-                <h2 class="text-3xl font-bold text-center mb-12">Revolutionizing Healthcare Decision-Making</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <div class="feature-card bg-white p-8 rounded-lg shadow-lg flex flex-col justify-between">
-                        <div>
-                            <h3 class="text-xl font-bold mb-4">Gen-AI Powered Insights</h3>
-                            <p class="mb-6">Harness the power of advanced artificial intelligence to analyze complex
-                                medical data and provide actionable insights for precision medicine.</p>
+                    <!-- BioMed-KAI (Biomedicine Knowledge-Aided Intelligence)
+Title:
+Enhancing Precision Medicine with AI-Driven Insights and Knowledge Integration
+Subheading:
+Empowering healthcare professionals with data-driven insights, leveraging AI and comprehensive biomedical knowledge to support personalized treatment decisions. -->
+                    <a href="midas"
+                        class="bg-white text-blue-600 font-bold py-3 px-8 rounded-full hover:bg-blue-100 transition duration-300">Chat with BioMed-KAI</a>
+                </div>
+            </section>
+
+            <section id="learn-more" class="py-20 bg-gray-100">
+                <div class="container mx-auto px-6">
+                    <h2 class="text-3xl font-bold text-center mb-12">Advanced Healthcare Intelligence Platform</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div class="feature-card bg-white p-8 rounded-lg shadow-lg flex flex-col justify-between">
+                            <div>
+                                <h3 class="text-xl font-bold mb-4">Comprehensive Knowledge Graph</h3>
+                                <p class="mb-6">Our dynamic biomedical knowledge graph integrates and connects complex medical data, updated monthly with the latest research findings. Built on Neo4j architecture, it maintains over 200 million relationships across diseases, drugs, genes, and clinical outcomes, ensuring healthcare professionals have access to the most current and relevant information.</p>
+                            </div>
+                            <div class="mt-auto">
+                                <a href="http://pitools.niper.ac.in/medkg/" target="_blank" class="inline-block bg-blue-100 text-blue-600 font-bold py-3 px-8 rounded-full hover:bg-blue-400 transition duration-300">Explore Knowledge Graph</a>
+                            </div>
                         </div>
-                        <div class="mt-auto">
-                            <a href="#"
-                                class="inline-block bg-blue-100 text-blue-600 font-bold py-3 px-8 rounded-full hover:bg-blue-400 transition duration-300">Explore
-                                AI Capabilities</a>
+                        <div class="feature-card bg-white p-8 rounded-lg shadow-lg flex flex-col justify-between">
+                            <div>
+                                <h3 class="text-xl font-bold mb-4">Integrated Data Resources</h3>
+                                <p class="mb-6">Leveraging 20+ authoritative databases including UniProt, DrugBank, and GWAS Catalog, alongside 15 comprehensive ontologies such as MonDO and HPO. Our platform synthesizes data from genomics, proteomics, clinical studies, and pharmaceutical research, providing a robust foundation for medical insights.</p>
+                            </div>
+                            <div class="mt-auto">
+                                <a href="source" class="inline-block bg-blue-100 text-blue-600 font-bold py-3 px-8 rounded-full hover:bg-blue-400 transition duration-300">View Data Sources</a>
+                            </div>
                         </div>
-                    </div>
-                    <div class="feature-card bg-white p-8 rounded-lg shadow-lg flex flex-col justify-between">
-                        <div>
-                            <h3 class="text-xl font-bold mb-4">Dynamic Knowledge Graph</h3>
-                            <p class="mb-6">Access an ever-growing, regularly updated medical knowledge graph that
-                                ensures you're always working with the latest scientific discoveries and clinical
-                                guidelines.</p>
-                        </div>
-                        <div class="mt-auto">
-                            <a href="http://pitools.niper.ac.in/medkg/visualise?id=4:9b513743-a03e-43a5-9caa-0b5cdeb9009c:1687100&name=Duloxetine&type=Drug" target="_blank"
-                                class="inline-block bg-blue-100 text-blue-600 font-bold py-3 px-8 rounded-full hover:bg-blue-400 transition duration-300">Explore
-                                Our KG</a>
-                        </div>
-                    </div>
-                    <div class="feature-card bg-white p-8 rounded-lg shadow-lg flex flex-col justify-between">
-                        <div>
-                            <h3 class="text-xl font-bold mb-4">Precision Diagnostics</h3>
-                            <p class="mb-6">Leverage our advanced query system to get precise diagnostic insights and
-                                treatment recommendations tailored to individual patient profiles.</p>
-                        </div>
-                        <div class="mt-auto">
-                            <a href="midas"
-                                class="inline-block bg-blue-100 text-blue-600 font-bold py-3 px-8 rounded-full hover:bg-blue-400 transition duration-300">See
-                                It In Action</a>
+                        <div class="feature-card bg-white p-8 rounded-lg shadow-lg flex flex-col justify-between">
+                            <div>
+                                <h3 class="text-xl font-bold mb-4">Interactive Clinical Support</h3>
+                                <p class="mb-6">Engage with our platform through natural language queries, accessing comprehensive biomedical information, treatment pathways, and drug interactions. Features include customizable visualization tools, automated literature synthesis, real-time clinical guidance, and integration with existing healthcare systems for seamless workflow enhancement.</p>
+                            </div>
+                            <div class="mt-auto">
+                                <a href="midas" class="inline-block bg-blue-100 text-blue-600 font-bold py-3 px-8 rounded-full hover:bg-blue-400 transition duration-300">Explore Features</a>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
 
-        <section class="py-20 bg-white">
+
+        </div>
+        <section class="bottom-cta py-20 bg-white">
             <div class="container mx-auto px-6">
-                <h2 class="text-3xl font-bold text-center mb-12">The MIDAS Advantage</h2>
+                <h2 class="text-3xl font-bold text-center mb-12">BioMed-KAI Advantage</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
                     <div>
-                        <img src="/api/placeholder/600/400" alt="MIDAS in action" class="rounded-lg shadow-xl">
+                        <img src="/api/placeholder/600/400" alt="BioMed-KAI in action" class="rounded-lg shadow-xl">
                     </div>
                     <div>
                         <ul class="space-y-4">
                             <li class="flex items-start">
-                                <svg class="w-6 h-6 text-green-500 mr-2" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                <svg class="w-6 h-6 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
-                                <span>Unparalleled accuracy in diagnostic suggestions</span>
+                                <span>Comprehensive data integration from 20+ authoritative databases including UniProt, DrugBank, and GWAS Catalog</span>
                             </li>
                             <li class="flex items-start">
-                                <svg class="w-6 h-6 text-green-500 mr-2" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                <svg class="w-6 h-6 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
-                                <span>Real-time integration of the latest medical research</span>
+                                <span>Monthly updated knowledge graph with over 50 million biomedical relationships</span>
                             </li>
                             <li class="flex items-start">
-                                <svg class="w-6 h-6 text-green-500 mr-2" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                <svg class="w-6 h-6 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
-                                <span>Personalized treatment plans based on individual patient data</span>
+                                <span>Integration of 13 specialized medical ontologies including MonDO, HPO, and SNOMED CT</span>
                             </li>
                             <li class="flex items-start">
-                                <svg class="w-6 h-6 text-green-500 mr-2" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                <svg class="w-6 h-6 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
-                                <span>Intuitive interface for complex medical queries</span>
+                                <span>Natural language processing for intuitive clinical queries and information retrieval</span>
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="w-6 h-6 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <span>Advanced visualization tools for complex biomedical relationships and pathways</span>
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="w-6 h-6 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <span>Seamless integration with existing healthcare systems and workflows</span>
                             </li>
                         </ul>
                     </div>
                 </div>
             </div>
         </section>
-
-        <section class="py-20 bg-blue-600 text-white">
+        <section class="bottom-cta py-20 bg-blue-600 text-white">
             <div class="container mx-auto px-6 text-center">
                 <h2 class="text-3xl font-bold mb-8">Ready to Transform Your Medical Practice?</h2>
-                <p class="text-xl mb-8">Join the future of precision medicine with MIDAS</p>
+                <p class="text-xl mb-8">Join the future of precision medicine with BioMed-KAI</p>
                 <a href="#"
                     class="bg-white text-blue-600 font-bold py-3 px-8 rounded-full hover:bg-blue-100 transition duration-300">Request
                     a Demo</a>
@@ -165,7 +194,7 @@
 
     <footer class="bg-gray-800 text-white py-8">
         <div class="container mx-auto px-6 text-center">
-            <p>&copy; 2024 MIDAS. Empowering Precision Medicine with Advanced AI and Dynamic Knowledge Graphs. All
+            <p>&copy; 2024 BioMed-KAI. Empowering Precision Medicine with Advanced AI and Dynamic Knowledge Graphs. All
                 rights reserved.</p>
         </div>
     </footer>

@@ -8,7 +8,7 @@ from langchain.embeddings.huggingface import HuggingFaceEmbeddings
 from llama_cpp import Llama
 from langchain.chains import RetrievalQA
 from huggingface_hub.hf_api import HfFolder
-from .data_retreival import fetch_context
+from model.dr import fetch_context, detect_medical_entities, generate_recommendations, preprocess_query, detect_entities_from_index
 
 # from schemas.rag import KGRag
 
@@ -60,7 +60,8 @@ def custom_token_ban_logits_processor(token_ids, input_ids, logits):
 class LlamaCppModel:
     models = {
             'llama-3': 'H:\\workspace\\NEXIS\\src\\models\\Meta-Llama-3-8B-Instruct.Q8_0.gguf',
-            'llama-3.1': 'H:\\workspace\\NEXIS\\src\\models\\Meta-Llama-3.1-8B-Instruct-Q8_0.gguf',
+            'llama-3.1': 'H:\\workspace\\NEXIS\\src\\models\\Meta-Llama-3.1-8B-Instruct-Q6_K_L.gguf', #'H:\\workspace\\NEXIS\\src\\models\\Meta-Llama-3.1-8B-Instruct-Q8_0.gguf',
+            'llama-3.2': 'H:\\workspace\\NEXIS\\src\\models\\Llama-3.2-3B-Instruct-uncensored-Q8_0.gguf',
         }
     model_name = 'llama-3.1'
     def __init__(self, model_name='llama-3.1'):
@@ -71,6 +72,7 @@ class LlamaCppModel:
         self.grammar_string = ''
         self.grammar = None
         self.rag_chain = None
+        self.context_cache = {}
 
     def __del__(self):
         del self.model
@@ -156,6 +158,133 @@ class LlamaCppModel:
             prompt = prompt.replace("/", "//")
         return prompt            
     
+
+    async def generate2(self, prompt: str, state, callback=None):
+        """
+        Enhanced generate method with context fetching and recommendations.
+        """
+        # First, try to detect medical entities in the prompt
+        # entities = detect_medical_entities(prompt)
+
+        # Preprocess the prompt
+        # processed_prompt = preprocess_query(prompt)
+        # print("Processed Prompt: ", processed_prompt)
+        
+        # # Detect entities using Neo4j index
+        # entities = detect_entities_from_index(processed_prompt)
+        
+        # print("Entities: ", entities)
+        # Fetch context if medical entities are detected
+        context, recommendations = fetch_context({"text": prompt})
+        print("Context: ", context)
+        # print("Recommendations: ", recommendations)
+        # Prepare the enhanced prompt with context
+        enhanced_prompt = prompt
+        if context:
+            enhanced_prompt = f"""
+            Context:
+            {context}
+            
+            User Question: {prompt}
+            """
+        
+        # Generate response using the model
+        response = ""
+        async for chunk in self.call_model(enhanced_prompt, state, callback):
+            response += chunk
+            yield chunk
+        
+        # After generating the main response, add recommendations
+        # print("Recommendations: ", response)
+        print("Recommendations: ", recommendations)
+        # if recommendations:
+        #     yield "$$-+Recommendations+-$$" + str(recommendations)
+
+    async def call_model(self, prompt, state, callback=None):
+        print("Enhanced Prompt: ", prompt)
+
+        LogitsProcessorList = llama_cpp_lib().LogitsProcessorList
+        prompt = prompt if type(prompt) is str else prompt.decode()
+
+        prompt = self.sanitize_prompt(prompt)
+
+        # Handle truncation
+        prompt = self.encode(prompt)
+        prompt = prompt[-10000:]
+        prompt = self.decode(prompt)
+
+        self.load_grammar("")
+        logit_processors = LogitsProcessorList()
+
+        input = """
+            <|begin_of_text|><|start_header_id|>system<|end_header_id|>
+            You are MIDAS, A medical chat assistant, who answers user queries like a professional Medical Expert.
+            Whenever and only when in need of more context use the fetch_context function with the required parameters. 
+            If its a known question without need of specific information, no need to use the function.
+            When using the context, no need to apologize for not knowing the answer, just answer the query and do not mention `based on the context provided` or `based on the search result` etc.
+            Always respond in a professional manner and provide accurate information in markdown format.
+            <|eot_id|>
+            <|start_header_id|>user<|end_header_id|>
+            Question: """ + prompt + \
+            """<|eot_id|>
+            <|start_header_id|>assistant<|end_header_id|>
+        """
+
+        # pp = """
+        #     You are a medical chat assistant who answers user queries like a professional Medical Expert.
+        #     Whenever in need of more context use the fetch_context function with the required parameters.
+        #     When answering a known question without need of specific information, no need to use the function.
+        #     """
+
+        # messages = [
+        #         { "role": "system", "content": pp},
+        #         { "role": "user", "content": prompt}
+        #     ]
+
+        # Debug
+        # print("Final prompt for inference: ", prompt)
+        completion_chunks = self.model.create_completion(input,
+                max_tokens=8192,
+                temperature=0.9,
+                top_p=0.1,
+                min_p=0.5,
+                typical_p=1,
+                frequency_penalty=0.6,
+                presence_penalty=0,
+                repeat_penalty=1.18,
+                top_k=40,
+                stream=True,
+                seed=-1,
+                tfs_z=1,
+                mirostat_mode=0,
+                mirostat_tau=1,
+                mirostat_eta=0.1,
+            )
+
+        output = ""
+        tool_call = ""
+        can_yield = False
+        for completion_chunk in completion_chunks:
+            delta = completion_chunk["choices"][0]["text"]
+            # print("output text: ", delta)
+            # text = ""
+            # if "content" in delta:
+            #     text = delta["content"]
+            
+            output += delta
+            if len(output) > 20:
+                if "<function" not in output and "Please wait" not in output and can_yield == False:
+                    yield f"{output}"
+                    can_yield = True
+                elif "</function>" in output:
+                    tool_call = output
+                    output = ""
+                if can_yield == True:
+                    yield f"{delta}"
+
+
+
+
     async def generate(self, prompt, state, callback=None):
         # Debug
         print("Initial Prompt: ", prompt)
@@ -227,7 +356,8 @@ class LlamaCppModel:
             You are MIDAS, A medical chat assistant, who answers user queries like a professional Medical Expert.
             Whenever and only when in need of more context use the fetch_context function with the required parameters. 
             If its a known question without need of specific information, no need to use the function.
-            When using the context, no need to apologize for not knowing the answer, just answer the query.
+            When using the context, no need to apologize for not knowing the answer, just answer the query and do not mention `based on the context provided` or `based on the search result` etc.
+            Always respond in a professional manner and provide accurate information in markdown format.
             <|eot_id|>
             <|start_header_id|>user<|end_header_id|>
             Question: """ + prompt + \
@@ -316,14 +446,17 @@ class LlamaCppModel:
                 'parameters': parameters
             })
         
+        print("Output: ", output)
         if output.strip() == "" and tool_call.strip() == "":
+            print("Apologies, I do not know the answer to this query.")
             output = "Apologies, I do not know the answer to this query."
         elif "<function" in  tool_call and len(output) < 100:
+            print("Tool Call: ", tool_call)
             input += tool_call + "<|eom_id|><|start_header_id|>ipython<|end_header_id|>"
             context = parse_function_string(tool_call)
+            input += context + " <|eot_id|><|start_header_id|>assistant<|end_header_id|> "
             # input += query
             print("Context: ", context)
-            input += context + " <|eot_id|><|start_header_id|>assistant<|end_header_id|> "
             completion_chunks = self.model.create_completion(input,
                 max_tokens=4096,
                 temperature=0.9,
@@ -351,7 +484,7 @@ class LlamaCppModel:
                 
                 output1 += delta
                 yield delta
-            # print("Output222222: ", output1)    
+            print("Output222222: ", output1)    
             # return output1
         # print("Output: ", output)
 
