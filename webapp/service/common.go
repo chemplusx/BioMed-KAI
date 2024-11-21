@@ -1,19 +1,54 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
+	"strings"
 	"sync"
 	"time"
 
 	"github.com/gorilla/websocket"
 )
 
-var messageChannel = make(chan string)
-var responseChannel = make(chan string)
-var wsConn *websocket.Conn
-var mu sync.Mutex
+type Config struct {
+	URL                  string
+	MaxReconnectAttempts int
+	ReconnectDelay       time.Duration
+	PingPeriod           time.Duration
+	PongWait             time.Duration
+	WriteWait            time.Duration
+	MessageBufferSize    int
+}
+
+type Service struct {
+	config Config
+	conn   *websocket.Conn
+	mu     sync.RWMutex
+
+	ctx    context.Context
+	cancel context.CancelFunc
+
+	messageChannel  chan Message
+	responseChannel chan string
+	responseDone    chan struct{}
+
+	isConnected bool
+}
+
+type ConversationEntry struct {
+	role string
+	text string
+}
+
+type Message struct {
+	Action  string              `json:"action"`
+	Prompt  string              `json:"prompt,omitempty"`
+	Text    string              `json:"text,omitempty"`
+	History []ConversationEntry `json:"history,omitempty"`
+	Stream  bool                `json:"stream,omitempty"`
+}
 
 type ResponseMessage struct {
 	Type        string `json:"type"`
@@ -23,214 +58,329 @@ type ResponseMessage struct {
 	Error       string `json:"error,omitempty"`
 }
 
-// func Init() {
-// 	fmt.Println("Init service")
-
-// 	url := "ws://localhost:8765"
-// 	var err error
-// 	wsConn, _, err = websocket.DefaultDialer.Dial(url, nil)
-// 	if err != nil {
-// 		log.Fatal("dial:", err)
-// 	}
-
-// 	done := make(chan struct{})
-
-// 	go func() {
-// 		defer close(done)
-// 		for {
-// 			_, message, err := wsConn.ReadMessage()
-// 			if err != nil {
-// 				log.Println("read:", err)
-// 				return
-// 			}
-// 			handleResponse(message)
-// 		}
-// 	}()
-
-// 	go MessageProcessor(done)
-
-// 	log.Println("Init service done")
-// }
-
-var (
-	wsMutex sync.Mutex
-)
-
-const (
-	maxReconnectAttempts = 5
-	reconnectDelay       = 5 * time.Second
-	pingPeriod           = 5 * time.Second  // Reduced from 10s
-	pongWait             = 25 * time.Second // Reduced from 15s
-	writeWait            = 10 * time.Second
-)
-
-func Init() {
-	fmt.Println("Init service")
-
-	url := "ws://localhost:8765"
-	go connectWebSocket(url)
-
-	log.Println("Init service done")
-}
-
-func connectWebSocket(url string) {
-	for {
-		wsConn = nil
-		err := connect(url)
-		if err != nil {
-			log.Println("Connection failed:", err)
-			time.Sleep(reconnectDelay)
-			continue
-		}
-
-		log.Println("WebSocket connected")
-
-		done := make(chan struct{})
-		go readPump(done)
-		go writePump(done)
-		go MessageProcessor(done)
-
-		<-done // Wait for done signal
-		log.Println("WebSocket disconnected, attempting to reconnect...")
+func DefaultConfig() Config {
+	return Config{
+		URL:                  "ws://localhost:8765",
+		MaxReconnectAttempts: 0,
+		ReconnectDelay:       5 * time.Second,
+		PingPeriod:           5 * time.Second,
+		PongWait:             25 * time.Second,
+		WriteWait:            10 * time.Second,
+		MessageBufferSize:    100,
 	}
 }
 
-func connect(url string) error {
-	wsConn = nil
-	wsDialer := websocket.Dialer{
-		HandshakeTimeout: 5 * time.Second,
+func NewService(config Config) *Service {
+	ctx, cancel := context.WithCancel(context.Background())
+	return &Service{
+		config:          config,
+		ctx:             ctx,
+		cancel:          cancel,
+		messageChannel:  make(chan Message, config.MessageBufferSize),
+		responseChannel: make(chan string, config.MessageBufferSize),
+		responseDone:    make(chan struct{}),
 	}
-	conn, _, err := wsDialer.Dial(url, nil)
-	if err != nil {
-		return err
-	}
-	wsConn = conn
+}
+
+func (s *Service) Start() error {
+	log.Println("Starting WebSocket service")
+	go s.connectionManager()
 	return nil
 }
 
-func readPump(done chan struct{}) {
-	defer close(done)
-	wsConn.SetReadLimit(512) // Limit size of incoming messages
-	wsConn.SetReadDeadline(time.Now().Add(pongWait))
-	wsConn.SetPongHandler(func(string) error {
-		wsConn.SetReadDeadline(time.Now().Add(pongWait))
-		return nil
-	})
+func (s *Service) Stop() {
+	log.Println("Stopping WebSocket service")
+	s.cancel()
+	s.closeConnection()
+}
+
+func (s *Service) connectionManager() {
+	attempts := 0
 	for {
-		_, message, err := wsConn.ReadMessage()
-		if err != nil {
-			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-				log.Printf("error: %v", err)
-			}
+		select {
+		case <-s.ctx.Done():
 			return
+		default:
+			if err := s.connect(); err != nil {
+				log.Printf("Connection failed: %v", err)
+				s.setConnected(false)
+				attempts++
+
+				if s.config.MaxReconnectAttempts > 0 && attempts >= s.config.MaxReconnectAttempts {
+					log.Printf("Max reconnection attempts (%d) reached", s.config.MaxReconnectAttempts)
+					return
+				}
+
+				select {
+				case <-s.ctx.Done():
+					return
+				case <-time.After(s.config.ReconnectDelay):
+					continue
+				}
+			}
+
+			attempts = 0
+
+			errCh := make(chan error, 3)
+			go s.readPump(errCh)
+			go s.writePump(errCh)
+			go s.messageProcessor(errCh)
+
+			select {
+			case err := <-errCh:
+				log.Printf("Handler error: %v", err)
+				s.closeConnection()
+				continue
+			case <-s.ctx.Done():
+				return
+			}
 		}
-		handleResponse(message)
 	}
 }
 
-func writePump(done chan struct{}) {
-	ticker := time.NewTicker(pingPeriod)
+func (s *Service) connect() error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	if s.conn != nil {
+		s.conn.Close()
+		s.conn = nil
+	}
+
+	dialer := websocket.Dialer{
+		HandshakeTimeout: 5 * time.Second,
+	}
+
+	conn, _, err := dialer.Dial(s.config.URL, nil)
+	if err != nil {
+		return fmt.Errorf("dial error: %w", err)
+	}
+
+	s.conn = conn
+	s.isConnected = true
+	log.Println("WebSocket connected successfully")
+	return nil
+}
+
+func (s *Service) closeConnection() {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.conn != nil {
+		s.conn.Close()
+		s.conn = nil
+	}
+	s.isConnected = false
+
+	select {
+	case s.responseDone <- struct{}{}:
+	default:
+	}
+}
+
+func (s *Service) readPump(errCh chan<- error) {
 	defer func() {
-		ticker.Stop()
-		wsConn.Close() // Ensure connection is closed
+		if r := recover(); r != nil {
+			errCh <- fmt.Errorf("readPump panic recovered: %v", r)
+		}
+	}()
+
+	s.conn.SetReadLimit(32768)
+	s.conn.SetReadDeadline(time.Now().Add(s.config.PongWait))
+	s.conn.SetPongHandler(func(string) error {
+		s.conn.SetReadDeadline(time.Now().Add(s.config.PongWait))
+		return nil
+	})
+
+	for {
+		_, message, err := s.conn.ReadMessage()
+		if err != nil {
+			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
+				errCh <- fmt.Errorf("unexpected close error: %w", err)
+			}
+			return
+		}
+		if err := s.handleResponse(message); err != nil {
+			log.Printf("Error handling response: %v", err)
+		}
+	}
+}
+
+func (s *Service) writePump(errCh chan<- error) {
+	ticker := time.NewTicker(s.config.PingPeriod)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-s.ctx.Done():
+			return
+		case <-ticker.C:
+			s.mu.Lock()
+			err := s.conn.WriteControl(websocket.PingMessage, nil, time.Now().Add(s.config.WriteWait))
+			s.mu.Unlock()
+			if err != nil {
+				errCh <- fmt.Errorf("ping error: %w", err)
+				return
+			}
+		}
+	}
+}
+
+func (s *Service) messageProcessor(errCh chan<- error) {
+	defer func() {
+		if r := recover(); r != nil {
+			errCh <- fmt.Errorf("messageProcessor panic recovered: %v", r)
+		}
 	}()
 
 	for {
 		select {
-		case <-done:
+		case <-s.ctx.Done():
 			return
-		case <-ticker.C:
-			if err := wsConn.WriteControl(websocket.PingMessage, []byte{}, time.Now().Add(writeWait)); err != nil {
-				log.Println("ping error:", err)
+		case msg := <-s.messageChannel:
+			log.Println("Processing message", msg)
+			if err := s.writeMessage(msg); err != nil {
+				errCh <- fmt.Errorf("write message error: %w", err)
 				return
 			}
 		}
 	}
 }
 
-func MessageProcessor(done chan struct{}) {
-	log.Println("MessageProcessor started")
-	for {
-		select {
-		case <-done:
-			log.Println("MessageProcessor: WebSocket disconnected")
-			return
-		// case <-interrupt:
-		// 	log.Println("interrupt")
-		// 	mu.Lock()
-		// 	err := wsConn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
-		// 	mu.Unlock()
-		// 	if err != nil {
-		// 		log.Println("write close:", err)
-		// 	}
-		// 	<-done
-		// 	return
-		case message := <-messageChannel:
-			log.Println("Sending message (inside msg processor):", message)
-			mu.Lock()
-			wsConn.SetWriteDeadline(time.Now().Add(writeWait))
-			wsConn.WriteMessage(websocket.TextMessage, []byte(message))
-			mu.Unlock()
+func (s *Service) writeMessage(msg Message) error {
+	writeDone := make(chan struct{})
+	go func() {
+		s.mu.Lock()
+		defer s.mu.Unlock()
+		defer close(writeDone)
 
+		if s.conn == nil {
+			return
 		}
+
+		data, err := json.Marshal(msg)
+		if err != nil {
+			log.Printf("Marshal error: %v", err)
+			return
+		}
+
+		s.conn.SetWriteDeadline(time.Now().Add(s.config.WriteWait))
+		if err := s.conn.WriteMessage(websocket.TextMessage, data); err != nil {
+			log.Printf("Write error: %v", err)
+			return
+		}
+	}()
+
+	select {
+	case <-writeDone:
+		return nil
+	case <-time.After(5 * time.Second):
+		return fmt.Errorf("write message timeout")
 	}
 }
 
-func Send(action string, message string, callback func(string, bool)) {
-	log.Println("Send message:", message)
+func (s *Service) Send(action string, data MIDASRequest, callback func(string, bool)) error {
+	log.Println("Sending message to WebSocket")
+	if !s.IsConnected() {
+		log.Println("WebSocket is not connected")
+		return fmt.Errorf("websocket is not connected")
+	}
+
+	msg := Message{
+		Action: action,
+	}
 
 	if action == "generate" {
-		message = fmt.Sprintf(`{"action": "GENERATE_RESPONSE", "prompt": "%s", "stream": true}`, message)
+		msg.Action = "GENERATE_RESPONSE"
+		msg.Prompt = data.Text
+		if data.Conversations != nil && len(data.Conversations) > 0 {
+			for _, c := range data.Conversations {
+				role, text := strings.Split(c, "-$$-")[0], strings.Split(c, "-$$-")[1]
+				msg.History = append(msg.History, ConversationEntry{
+					role: role,
+					text: text,
+				})
+			}
+		}
+		msg.Stream = true
 	} else {
-		message = fmt.Sprintf(`{"action": "%s", "text": "%s"}`, action, message)
+		msg.Text = data.Text
 	}
 
-	wsMutex.Lock()
-	defer wsMutex.Unlock()
+	log.Println("Sending message", msg)
 
-	if wsConn == nil {
-		log.Println("WebSocket connection is nil")
-		return
+	select {
+	case s.messageChannel <- msg:
+	case <-time.After(5 * time.Second):
+		return fmt.Errorf("timeout sending message")
 	}
 
-	messageChannel <- message
+	done := make(chan struct{})
 
-	// The actual response handling is now done in the handleResponse function
-	for {
-		select {
-		case response := <-responseChannel:
-			callback(response, true)
-			if response == "<EOR>" {
+	go func() {
+		defer close(done)
+		for {
+			select {
+			case <-s.ctx.Done():
+				callback("", true)
+				return
+			case <-s.responseDone:
+				callback("Connection closed", true)
+				return
+			case response := <-s.responseChannel:
+				if response == "<EOR>" {
+					callback("", true)
+					return
+				}
+				callback(response, false)
+			case <-time.After(30 * time.Second):
+				callback("Response timeout", true)
 				return
 			}
 		}
-	}
+	}()
+
+	return nil
 }
 
-func handleResponse(message []byte) {
+func (s *Service) handleResponse(message []byte) error {
 	var response ResponseMessage
-	err := json.Unmarshal(message, &response)
-	if err != nil {
-		log.Println("Error unmarshalling response:", err)
-		return
+	if err := json.Unmarshal(message, &response); err != nil {
+		return fmt.Errorf("unmarshal error: %w", err)
+	}
+
+	sendResponse := func(msg string) error {
+		select {
+		case s.responseChannel <- msg:
+			return nil
+		case <-time.After(5 * time.Second):
+			return fmt.Errorf("timeout sending response")
+		}
 	}
 
 	switch {
 	case response.StreamStart:
 		log.Println("Stream started")
-	case response.Chunk != "":
-		log.Printf("Received chunk: %s", response.Chunk)
-		responseChannel <- string(message)
-		// Here you would call your callback function with the chunk
-		// callback(response.Chunk, false)
 	case response.StreamEnd:
-		log.Println("Stream ended")
-		responseChannel <- string("<EOR>")
-		// Here you would call your callback function to indicate the end of the stream
-		// callback("", true)
+		return sendResponse("<EOR>")
 	case response.Error != "":
-		log.Printf("Error received: %s", response.Error)
+		return fmt.Errorf("server error: %s", response.Error)
 	default:
-		log.Printf("Unknown response type: %+v", response)
+		if response.Chunk != "" {
+			return sendResponse(response.Chunk)
+		}
 	}
+
+	return nil
+}
+
+func (s *Service) IsConnected() bool {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return s.isConnected
+}
+
+func (s *Service) setConnected(status bool) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.isConnected = status
 }

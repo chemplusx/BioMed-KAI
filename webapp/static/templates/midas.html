@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MIDAS - Immersive Precision Medicine Chat</title>
+    <title>BioMed-KAI - Immersive Precision Medicine Chat</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/2.8.2/alpine.js" defer></script>
 
@@ -138,7 +138,8 @@
             text-decoration: underline;
         }
 
-        .edit-button, .resend-button {
+        .edit-button,
+        .resend-button {
             display: none;
             position: absolute;
             top: -10px;
@@ -149,27 +150,34 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
+
         .edit-button {
             right: 40px;
             color: black;
         }
+
         .resend-button {
             right: 10px;
             color: black;
         }
+
         .message:hover .edit-button,
         .message:hover .resend-button {
             display: block;
         }
-        .edit-button:hover, .resend-button:hover {
+
+        .edit-button:hover,
+        .resend-button:hover {
             background-color: #e2e8f0;
         }
+
         .new-chat-button {
             position: fixed;
             top: 154px;
             right: 10px;
             z-index: 1000;
         }
+
         .error-message {
             background-color: #FEE2E2;
             border: 1px solid #F87171;
@@ -178,12 +186,14 @@
             border-radius: 5px;
             margin-bottom: 10px;
         }
+
         .editable-message {
             min-height: 24px;
             padding: 4px;
             border-radius: 4px;
             outline: none;
         }
+
         .editable-message:focus {
             background-color: rgba(255, 255, 255, 0.1);
         }
@@ -195,17 +205,18 @@
     <div class="sidebar fixed top-0 left-0 h-full w-64 text-white shadow-lg z-50 transform transition-transform duration-300 ease-in-out"
         :class="{ 'translate-x-0': sidebarOpen, '-translate-x-full': !sidebarOpen }">
         <div class="p-6">
-            <img src="static/midas-logo.png" alt="MIDAS Logo" class="h-30 mb-8 filter invert">
+            <img src="static/midas-logo.png" alt="BioMed-KAI Logo" class="h-30 mb-8 filter invert">
             <nav>
                 <ul class="space-y-4">
                     <li><a href="home"
                             class="text-gray-300 px-5 block py-2 hover:bg-blue-600 rounded transition duration-300">Home</a>
                     </li>
                     <li><a href="midas"
-                            class="text-white font-semibold px-5 block py-2 bg-blue-600 rounded transition duration-300">MIDAS</a>
+                            class="text-white font-semibold px-5 block py-2 bg-blue-600 rounded transition duration-300">BioMed-KAI</a>
                     </li>
                     <li><a href="source"
-                            class="text-gray-300 px-5 block py-2 hover:bg-blue-600 rounded transition duration-300">Knowledge Graph</a></li>
+                            class="text-gray-300 px-5 block py-2 hover:bg-blue-600 rounded transition duration-300">Knowledge
+                            Graph</a></li>
                     <li><a href="about"
                             class="text-gray-300 px-5 block py-2 hover:bg-blue-600 rounded transition duration-300">About</a>
                     </li>
@@ -220,18 +231,21 @@
 
     <main class="flex-grow">
         <section class="animated-bg text-white py-10">
-            <div class="sidebar-toggle absolute top-4 left-4 z-50" :class="{ 'active': sidebarOpen }" @click="sidebarOpen = !sidebarOpen">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <div class="sidebar-toggle absolute top-4 left-4 z-50" :class="{ 'active': sidebarOpen }"
+                @click="sidebarOpen = !sidebarOpen">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="3" y1="12" x2="21" y2="12"></line>
                     <line x1="3" y1="6" x2="21" y2="6"></line>
                     <line x1="3" y1="18" x2="21" y2="18"></line>
                 </svg>
             </div>
             <div class="container mx-auto px-6 text-center">
-                <h1 class="text-4xl md:text-5xl font-bold mb-4">Chat with MIDAS</h1>
+                <h1 class="text-4xl md:text-5xl font-bold mb-4">Chat with BioMed-KAI</h1>
             </div>
         </section>
-        <button id="new-chat" class="new-chat-button bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-full shadow-lg transition duration-300">
+        <button id="new-chat"
+            class="new-chat-button bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-full shadow-lg transition duration-300">
             <i class="fas fa-plus mr-2"></i>New Chat
         </button>
         <section class="flex-grow bg-gray-100 overflow-y-auto">
@@ -242,7 +256,7 @@
 
         <section class="bg-white shadow-md py-4">
             <div class="container mx-auto px-6">
-                <div class="grid grid-cols-2 gap-4 mb-4">
+                <div class="recommendation-section grid grid-cols-2 gap-4 mb-4">
                     <div
                         class="sample-input bg-gray-200 text-gray-700 rounded-lg p-3 cursor-pointer hover:bg-gray-300 text-sm">
                         What are the latest advancements in cancer immunotherapy?
@@ -263,7 +277,7 @@
                 <form id="chat-form" class="flex items-center">
                     <input type="text" id="user-input"
                         class="flex-grow px-4 py-2 border rounded-l-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Ask MIDAS about precision medicine...">
+                        placeholder="Ask BioMed-KAI about precision medicine...">
                     <button type="submit"
                         class="bg-blue-600 text-white px-6 py-2 rounded-r-full hover:bg-blue-700 transition duration-300 flex items-center">
                         <span class="mr-2">Send</span>
@@ -283,10 +297,15 @@
         const chatForm = document.getElementById('chat-form');
         const userInput = document.getElementById('user-input');
         const newChatButton = document.getElementById('new-chat');
+        const recommendationSec = document.querySelector('.recommendation-section');
 
         let messageIdCounter = 0;
         let editingMessageId = null;
         let chatHistory = [];
+        let chatDetails = {
+            "id": "biomedkai-chat-" + Math.random().toString(16).slice(2),
+            "chat_history": chatHistory
+        };
 
         marked.use({
             breaks: true,
@@ -298,17 +317,20 @@
         });
 
         // Add an initial welcome message
-        addMessage('ai', 'Welcome to MIDAS! How can I assist you with precision medicine today?');
+        addMessage('ai', 'Welcome to BioMed-KAI! How can I assist you with bio-medicine today?');
 
         chatForm.addEventListener('submit', function (e) {
             e.preventDefault();
             sendMessage();
         });
 
-        newChatButton.addEventListener('click', function() {
+        newChatButton.addEventListener('click', function () {
             chatMessages.innerHTML = '';
-            chatHistory = [];
-            addMessage('ai', 'Welcome to a new chat! How can I assist you with precision medicine today?');
+            chatDetails = {
+                "id": "biomedkai-chat-" + Math.random().toString(16).slice(2),
+                "chat_history": []
+            };
+            addMessage('ai', 'Welcome to a new chat! How can I assist you with bio-medicine today?');
         });
 
         function sendMessage() {
@@ -416,7 +438,7 @@
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ text: message, chatHistory: chatHistory }),
+                    body: JSON.stringify({ text: message, conversations: chatDetails.chat_history, id: chatDetails.id }),
                 });
 
                 const response = await Promise.race([fetchPromise, timeoutPromise]);
@@ -445,6 +467,7 @@
                     const lines = chunk.split('\n');
                     let eor = false;
                     removeThinkingIndicator(thinkingIndicator);
+
                     for (const line of lines) {
                         if (line.startsWith('data:')) {
                             const jsonStr = line.slice(5).trim();
@@ -454,10 +477,36 @@
                                     break;
                                 }
                                 const data = JSON.parse(jsonStr);
-                                fullResponse += data.chunk || '';
-                                aiMessageElement.querySelector('.message-content').innerHTML = marked.parse(fullResponse);
-                                hljs.highlightAll();
-                                chatMessages.scrollTop = chatMessages.scrollHeight;
+                                if (!data.chunk.includes('$$-+Recommendations+-$$')) {
+                                    if (data.chunk && data.chunk.length > 0 && fullResponse.endsWith(data.chunk) && fullResponse.length > data.chunk.length) {
+                                        // this means repeated chunks are being sent
+                                        // so we need to remove the last chunk from the full response
+                                        fullResponse = fullResponse.slice(0, -data.chunk.length);
+                                    }
+                                    fullResponse += data.chunk || '';
+                                    aiMessageElement.querySelector('.message-content').innerHTML = marked.parse(fullResponse);
+                                    hljs.highlightAll();
+                                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                                }else{
+                                    // this means we have reached the end of the response
+                                    // so we need to break the loop
+                                    recommendations = data.chunk.split('$$-+Recommendations+-$$')[1];
+                                    recArray = JSON.parse(recommendations);
+                                    
+                                    recArray.forEach(rec => {
+                                        const recDiv = document.createElement('div');
+                                        recDiv.className = 'sample-input bg-gray-200 text-gray-700 rounded-lg p-3 cursor-pointer hover:bg-gray-300 text-sm';
+                                        recDiv.textContent = rec;
+                                        recDiv.addEventListener('click', function () {
+                                            userInput.value = this.textContent.trim();
+                                            sendMessage();
+                                        });
+                                        // remove the current contents of the recommendation section
+                                        recommendationSec.innerHTML = '';
+                                        recommendationSec.appendChild(recDiv);
+                                    });
+
+                                }
                             } catch (e) {
                                 console.error('Error parsing JSON:', e);
                             }
@@ -469,6 +518,7 @@
                 }
                 chatHistory.push({ role: 'user', content: message });
                 chatHistory.push({ role: 'assistant', content: fullResponse });
+                chatDetails.chat_history = chatHistory;
             } catch (error) {
                 console.error('Streaming failed:', error);
                 if (timeoutOccurred) {
@@ -487,25 +537,30 @@
             const messageDiv = document.createElement('div');
             messageDiv.className = `flex ${sender === 'user' ? 'justify-end' : 'justify-start'} message-appear message relative`;
             messageDiv.dataset.id = messageId;
-            
+            messageDiv.style = sender === 'user' ? 'margin-left: auto;' : 'margin-left: 2.5rem;';
+
             const innerDiv = document.createElement('div');
             innerDiv.className = `${sender === 'user' ? 'bg-blue-600 text-white' : 'bg-white text-gray-800'} rounded-lg p-3 shadow-md markdown-content`;
-            
+
             const contentDiv = document.createElement('div');
             contentDiv.className = 'message-content';
             contentDiv.innerHTML = sender === 'user' ? text : marked.parse(text);
-            
+            contentDiv.style = sender === 'user' ? '' : "display: inline-block;padding: 0.5rem;border-radius: 0.5rem;width: calc(100% - 50px);";
+
+            // Use custom images for user and AI icons
+
+
             if (sender === 'user') {
                 contentDiv.contentEditable = true;
                 contentDiv.className += ' editable-message';
-                contentDiv.addEventListener('keydown', function(e) {
+                contentDiv.addEventListener('keydown', function (e) {
                     if (e.key === 'Enter' && !e.shiftKey) {
                         e.preventDefault();
                         this.blur();
                         handleEdit(messageId, this.innerText);
                     }
                 });
-                
+
                 const editButton = document.createElement('button');
                 editButton.innerHTML = '<i class="fas fa-edit"></i>';
                 editButton.className = 'edit-button';
@@ -519,7 +574,7 @@
                     selection.removeAllRanges();
                     selection.addRange(range);
                 });
-                
+
                 const resendButton = document.createElement('button');
                 resendButton.innerHTML = '<i class="fas fa-redo"></i>';
                 resendButton.className = 'resend-button';
@@ -527,16 +582,26 @@
 
                 innerDiv.appendChild(editButton);
                 innerDiv.appendChild(resendButton);
+            } else {
+                const icon = document.createElement('img');
+                icon.src = 'static/ai-animated.gif'; // Replace with actual paths
+                icon.alt = 'AI Icon';
+                icon.className = 'w-12 h-12 rounded-full'; // Adjust width and height as needed
+                icon.style = 'position: absolute;margin-left: -4rem;float: inline-start;';
+
+                // aiMessageElement.querySelector('.message-content').appendChild(icon);
+                innerDiv.appendChild(icon);
             }
-            
+
+
             innerDiv.appendChild(contentDiv);
             messageDiv.appendChild(innerDiv);
             chatMessages.appendChild(messageDiv);
-            
+
             if (sender === 'ai') {
                 hljs.highlightAll();
             }
-            
+
             chatMessages.scrollTop = chatMessages.scrollHeight;
             return innerDiv;
         }
@@ -566,20 +631,20 @@
             const messageDiv = document.querySelector(`.message[data-id="${id}"]`);
             const contentDiv = messageDiv.querySelector('.message-content');
             const message = contentDiv.innerText.trim();
-            
+
             // Remove all messages after this one
             let nextSibling = messageDiv.nextElementSibling;
             while (nextSibling) {
                 chatMessages.removeChild(nextSibling);
                 nextSibling = messageDiv.nextElementSibling;
             }
-            
+
             // Update chat history
             const messageIndex = chatHistory.findIndex(msg => msg.role === 'user' && msg.content === contentDiv.textContent.trim());
             if (messageIndex !== -1) {
                 chatHistory.splice(messageIndex + 1);
             }
-            
+
             streamResponse(message);
         }
 
@@ -588,7 +653,7 @@
             indicatorDiv.className = 'flex justify-start message-appear';
             indicatorDiv.innerHTML = `
                 <div class="bg-gray-200 text-gray-600 rounded-lg p-3 shadow-md flex items-center">
-                    <span class="mr-2">MIDAS is thinking</span>
+                    <span class="mr-2">BioMed-KAI is thinking</span>
                     <div class="flex space-x-1">
                         <div class="w-2 h-2 bg-gray-600 rounded-full pulse"></div>
                         <div class="w-2 h-2 bg-gray-600 rounded-full pulse" style="animation-delay: 0.2s"></div>

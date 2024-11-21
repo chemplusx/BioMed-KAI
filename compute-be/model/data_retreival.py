@@ -2,8 +2,9 @@ from neo4j import GraphDatabase
 from sentence_transformers import SentenceTransformer
 import yaml
 
-model = SentenceTransformer('BAAI/bge-large-en-v1.5')
-
+model = SentenceTransformer('BAAI/bge-large-en-v1.5',trust_remote_code=True)  #('BAAI/bge-large-en-v1.5')
+# dunzhang/stella_en_400M_v5
+# dunzhang/stella_en_1.5B_v5
 def hybrid_search(driver, query, index, keyword_index, k=1):
     print("Query: ", query, "Index: ", index, "Keyword Index: ", keyword_index, "K: ", k)
     # Load the embedding model
@@ -24,11 +25,12 @@ def hybrid_search(driver, query, index, keyword_index, k=1):
         WITH node, score
         ORDER BY score DESC 
         LIMIT $k
-        MATCH (n:Protein|Drug|Disease|Gene|Metabolite|Pathway|Biological_process|Peptide|Transcript|Compound|Tissue|Symptom) WHERE elementId(n) = node.f_key
+        MATCH (n:Protein|Drug|Phenotype|Disease|Gene|Metabolite|Pathway|Biological_process|Peptide|Transcript|Compound|Tissue|Symptom) WHERE elementId(n) = node.f_key
         WITH n, score
         CALL apoc.path.spanningTree(n, {
             maxLevel: $max_hops,
-            limit: 5
+            labelFilter: '+Drug|Phenotype|Disease|Gene|Metabolite|Pathway|Biological_process|Compound',
+            limit: 10
         }) YIELD path
         WITH n, score, relationships(path) AS rels, last(nodes(path)) AS related
         WHERE n <> related
@@ -38,7 +40,7 @@ def hybrid_search(driver, query, index, keyword_index, k=1):
         }) AS related_info
         RETURN {
             score: score,
-            metadata: n{.type},
+            metadata: labels(n)[0],
             root: apoc.map.removeKey(properties(n), 'embedding'),
             related_nodes: [related IN related_info | {
                 id: id(related.node),
@@ -57,7 +59,7 @@ def hybrid_search(driver, query, index, keyword_index, k=1):
                         k=k, 
                         embedding=embedding, 
                         text_query=query,
-                        max_hops=3)
+                        max_hops=1)
         return [record["result"] for record in result]
 
     with driver.session() as session:
@@ -72,7 +74,7 @@ def format_yaml_for_llm(results, max_related_nodes=5):
         try:
             formatted_yaml += f"Result {i}:\n"
             formatted_yaml += f"  Score: {result['score']}\n"
-            formatted_yaml += f"  Type: {result['metadata'].get('type', 'Unknown')}\n"
+            formatted_yaml += f"  Type: {result['metadata']}\n"
             formatted_yaml += "  Root Node:\n"
             for key, value in result['root'].items():
                 formatted_yaml += f"    {key}: {format_value(value)}\n"
@@ -133,7 +135,9 @@ def fetch_context(parameters):
         print("YAML Output:")
         print(formatted_yaml)
         return formatted_yaml
-
+    except Exception as e:
+        print("Error fetching context:", e)
+        return ""
     finally:
         driver.close()
 

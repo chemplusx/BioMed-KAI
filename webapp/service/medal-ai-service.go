@@ -11,6 +11,7 @@ import (
 // MIDASRequest represents a request to the MIDAS service.
 type MIDASRequest struct {
 	// The text to process
+	Id            string   `json:"id"`
 	Text          string   `json:"text"`
 	Conversations []string `json:"conversations"`
 	Count         int      `json:"count"`
@@ -75,11 +76,11 @@ func ProcessMIDASRequest(req MIDASRequest) (MIDASResponse, error) {
 
 	text := req.Text
 
-	callback := func(response string, bb bool) {
-		fmt.Println("Received response:", response)
-	}
+	// callback := func(response string, bb bool) {
+	// 	fmt.Println("Received response:", response)
+	// }
 
-	Send("generate", text, callback)
+	// Send("generate", text, callback)
 
 	input := `
             <|begin_of_text|><|start_header_id|>system<|end_header_id|>

@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 
+	"chemplusx.com/midas/controller"
 	"chemplusx.com/midas/server"
 	"chemplusx.com/midas/service"
 
@@ -18,7 +19,14 @@ func main() {
 		})
 	})
 	log.Println("Starting server")
-	service.Init()
+	config := service.DefaultConfig()
+	// Customize config if needed
+
+	controller.WS = service.NewService(config)
+	if err := controller.WS.Start(); err != nil {
+		log.Fatal(err)
+	}
+	defer controller.WS.Stop()
 	log.Println("Server started")
 	server.InitRouter(r)
 	r.Run(":5050")

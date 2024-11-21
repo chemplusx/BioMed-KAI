@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BioMed-KAI - Revolutionizing Precision Medicine with Advanced Gen-AI</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/2.8.2/alpine.js" defer></script>
+    <style>
+        /* Previous non-wave styles remain the same */
+        .bg-custom-dark {
+            background-color: #0F172A;
+        }
+
+        .bg-custom-darker {
+            background-color: #090E1A;
+        }
+
+        .card-gradient {
+            background: linear-gradient(180deg, rgba(30, 41, 59, 0.5) 0%, rgba(15, 23, 42, 0.5) 100%);
+        }
+
+        /* Updated Wave Animation Styles */
+        .wave-header {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(45deg, #0F172A, #1E3A8A);
+        }
+
+        .wave-container {
+            position: absolute;
+            width: 200%;
+            height: 100%;
+            bottom: 0;
+            left: 0;
+            animation: wave-move 20s linear infinite;
+            transform: translateZ(0);
+        }
+
+        .wave {
+            position: relative;
+            float: left;
+            width: 50%;
+            height: 100%;
+            background-repeat: repeat-x;
+            background-position: 0 bottom;
+        }
+
+        .wave-container-1 {
+            opacity: 0.3;
+            animation-duration: 18s;
+        }
+
+        .wave-container-1 .wave {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 88.7'%3E%3Cpath d='M800 56.9c-155.5 0-204.9-50-405.5-49.9-200 0-250 49.9-394.5 49.9v31.8h800v-.2-31.6z' fill='%232563EB'/%3E%3C/svg%3E");
+        }
+
+        .wave-container-2 {
+            opacity: 0.6;
+            animation-duration: 15s;
+        }
+
+        .wave-container-2 .wave {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 88.7'%3E%3Cpath d='M800 56.9c-155.5 0-204.9-50-405.5-49.9-200 0-250 49.9-394.5 49.9v31.8h800v-.2-31.6z' fill='%231D4ED8'/%3E%3C/svg%3E");
+        }
+
+        .wave-container-3 {
+            opacity: 0.9;
+            animation-duration: 12s;
+        }
+
+        .wave-container-3 .wave {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 88.7'%3E%3Cpath d='M800 56.9c-155.5 0-204.9-50-405.5-49.9-200 0-250 49.9-394.5 49.9v31.8h800v-.2-31.6z' fill='%231E40AF'/%3E%3C/svg%3E");
+        }
+
+        @keyframes wave-move {
+            0% {
+                transform: translateX(0) translateZ(0);
+            }
+
+            100% {
+                transform: translateX(-50%) translateZ(0);
+            }
+        }
+
+        .glow-text {
+            text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+        }
+    </style>
+</head>
+
+<body class="bg-custom-dark text-gray-100" x-data="{ sidebarOpen: false }">
+    <!-- Sidebar -->
+    <div class="fixed top-0 left-0 h-full w-64 bg-custom-darker transform transition-transform duration-300 ease-in-out z-50"
+        :class="{ 'translate-x-0': sidebarOpen, '-translate-x-full': !sidebarOpen }">
+        <div class="p-6">
+            <!-- <img src="static/midas-logo.png" alt="BioMed-KAI Logo" class="h-30 mb-8 filter invert"> -->
+            <img src="static/BioMed-KAI-logo.png" alt="BioMed-KAI Logo" class="h-30 mb-8 filter invert">
+            <nav>
+                <ul class="space-y-2">
+                    <li>
+                        <a href="home" class="text-white font-semibold px-4 py-2 block bg-blue-600 rounded">Home</a>
+                    </li>
+                    <li>
+                        <a href="midas" class="text-gray-400 px-4 py-2 block hover:bg-gray-800 rounded">BioMed-KAI</a>
+                    </li>
+                    <!-- <li>
+                        <a href="source" class="text-gray-400 px-4 py-2 block hover:bg-gray-800 rounded">Knowledge Graph</a>
+                    </li>
+                    <li>
+                        <a href="about" class="text-gray-400 px-4 py-2 block hover:bg-gray-800 rounded">About</a>
+                    </li> -->
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    <div class="overlay fixed inset-0 bg-black opacity-50 z-40" x-show="sidebarOpen" @click="sidebarOpen = false"></div>
+
+    <!-- Main Content -->
+    <main class="min-h-screen">
+        <!-- Header Section -->
+        <section class="wave-header relative py-10">
+            <!-- New wave structure -->
+            <div class="wave-container wave-container-1">
+                <div class="wave"></div>
+                <div class="wave"></div>
+            </div>
+            <div class="wave-container wave-container-2">
+                <div class="wave"></div>
+                <div class="wave"></div>
+            </div>
+            <div class="wave-container wave-container-3">
+                <div class="wave"></div>
+                <div class="wave"></div>
+            </div>
+
+            <div class="sidebar-toggle absolute top-4 left-4 z-50 text-gray-400" @click="sidebarOpen = !sidebarOpen">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </div>
+            <div class="container mx-auto px-6 text-center relative z-10">
+                <h1 class="text-5xl md:text-6xl font-bold mb-4 glow-text">BioMed-KAI</h1>
+                <p class="text-3xl font-bold mb-8 text-blue-400 glow-text">(Biomedicine Knowledge-Aided Intelligence)
+                </p>
+                <p class="text-2xl mb-8 text-gray-300">Enhancing Precision Medicine with AI-Driven Insights and
+                    Knowledge Integration</p>
+                <a href="midas"
+                    class="bg-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-blue-700 transition duration-300 shadow-lg hover:shadow-xl">
+                    Chat with BioMed-KAI
+                </a>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="py-20">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center mb-12 text-blue-400">Advanced Healthcare Intelligence Platform
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Knowledge Graph Card -->
+                    <div class="card-gradient p-8 rounded-lg border border-gray-800">
+                        <h3 class="text-xl font-bold mb-4 text-white">Comprehensive Knowledge Graph</h3>
+                        <p class="mb-6 text-gray-300">Our dynamic biomedical knowledge graph integrates and connects
+                            complex medical data, updated monthly with the latest research findings. Built on Neo4j
+                            architecture, it maintains over 200 million relationships across diseases, drugs, genes, and
+                            clinical outcomes, ensuring healthcare professionals have access to the most current and
+                            relevant information.</p>
+                        <a href="http://pitools.niper.ac.in/medkg/" target="_blank"
+                            class="inline-block bg-blue-600 text-white font-bold py-2 px-6 rounded hover:bg-blue-700 transition duration-300">
+                            Explore Knowledge Graph
+                        </a>
+                    </div>
+                    <!-- Data Resources Card -->
+                    <div class="card-gradient p-8 rounded-lg border border-gray-800">
+                        <h3 class="text-xl font-bold mb-4 text-white">Integrated Data Resources</h3>
+                        <p class="mb-6 text-gray-300">Leveraging 20+ authoritative databases including UniProt,
+                            DrugBank, and GWAS Catalog, alongside 15 comprehensive ontologies such as MonDO and HPO. Our
+                            platform synthesizes data from genomics, proteomics, clinical studies, and pharmaceutical
+                            research, providing a robust foundation for medical insights.</p>
+                        <a href="source"
+                            class="inline-block bg-blue-600 text-white font-bold py-2 px-6 rounded hover:bg-blue-700 transition duration-300">
+                            View Data Sources
+                        </a>
+                    </div>
+                    <!-- Clinical Support Card -->
+                    <div class="card-gradient p-8 rounded-lg border border-gray-800">
+                        <h3 class="text-xl font-bold mb-4 text-white">Interactive Clinical Support</h3>
+                        <p class="mb-6 text-gray-300">Engage with our platform through natural language queries,
+                            accessing comprehensive biomedical information, treatment pathways, and drug interactions.
+                            Features include customizable visualization tools, automated literature synthesis, real-time
+                            clinical guidance, and integration with existing healthcare systems for seamless workflow
+                            enhancement.</p>
+                        <a href="midas"
+                            class="inline-block bg-blue-600 text-white font-bold py-2 px-6 rounded hover:bg-blue-700 transition duration-300">
+                            Explore Features
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Advantages Section -->
+        <section class="py-20 bg-custom-darker">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center mb-12 text-blue-400">BioMed-KAI Advantage</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                    <div>
+                        <img src="static/inaction.gif" alt="BioMed-KAI in action" class="rounded-lg shadow-xl" style="max-width: 725px;">
+                    </div>
+                    <div class="space-y-4">
+                        <div class="flex items-start space-x-3 py-3">
+                            <svg class="w-6 h-6 text-blue-400 mt-1 flex-shrink-0" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <span class="text-gray-300">Comprehensive data integration from 20+ authoritative databases
+                                including UniProt, DrugBank, and GWAS Catalog</span>
+                        </div>
+                        <div class="flex items-start space-x-3 py-3">
+                            <svg class="w-6 h-6 text-blue-400 mt-1 flex-shrink-0" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <span class="text-gray-300">Monthly updated knowledge graph with over 50 million biomedical
+                                relationships</span>
+                        </div>
+                        <div class="flex items-start space-x-3 py-3">
+                            <svg class="w-6 h-6 text-blue-400 mt-1 flex-shrink-0" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <span class="text-gray-300">Integration of 13 specialized medical ontologies including
+                                MonDO, HPO, and SNOMED CT</span>
+                        </div>
+                        <div class="flex items-start space-x-3 py-3">
+                            <svg class="w-6 h-6 text-blue-400 mt-1 flex-shrink-0" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <span class="text-gray-300">Natural language processing for intuitive clinical queries and
+                                information retrieval</span>
+                        </div>
+                        <div class="flex items-start space-x-3 py-3">
+                            <svg class="w-6 h-6 text-blue-400 mt-1 flex-shrink-0" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <span class="text-gray-300">Advanced visualization tools for complex biomedical
+                                relationships and pathways</span>
+                        </div>
+                        <div class="flex items-start space-x-3 py-3">
+                            <svg class="w-6 h-6 text-blue-400 mt-1 flex-shrink-0" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <span class="text-gray-300">Seamless integration with existing healthcare systems and
+                                workflows</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="py-20 bg-blue-600">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-3xl font-bold mb-8">Ready to Transform Your Medical Practice?</h2>
+                <p class="text-xl mb-8">Join the future of precision medicine with BioMed-KAI</p>
+                <a href="#"
+                    class="bg-white text-blue-600 font-bold py-3 px-8 rounded-lg hover:bg-gray-100 transition duration-300">
+                    Request a Demo
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-custom-darker text-gray-400 py-8">
+        <div class="container mx-auto px-6 text-center">
+            <p>&copy; 2024 BioMed-KAI. Empowering Precision Medicine with Advanced AI and Dynamic Knowledge Graphs. All
+                rights reserved.</p>
+        </div>
+    </footer>
+</body>
+
+</html>
