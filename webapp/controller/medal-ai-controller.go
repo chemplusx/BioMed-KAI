@@ -4,6 +4,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strings"
 
 	"chemplusx.com/midas/service"
 	"github.com/gin-gonic/gin"
@@ -41,6 +42,7 @@ func MIDASHandler(c *gin.Context) {
 	go WS.Send("generate", req, func(response string, done bool) {
 		if done {
 			log.Println("Stream complete")
+			respChan <- "<EOR>"
 			return
 		}
 		respChan <- response
@@ -54,8 +56,24 @@ func MIDASHandler(c *gin.Context) {
 	c.Stream(func(w io.Writer) bool {
 		// Generate and send data based on the request
 		response := <-respChan
-		resp := map[string]interface{}{
-			"chunk": response,
+
+		if response == "<EOR>" {
+			c.SSEvent("message", "<EOR>")
+			c.Writer.Flush()
+			return true
+		}
+
+		var resp map[string]interface{}
+		if strings.Contains(response, "$$-+Recommendations+-$$") {
+			log.Println("Recommendations found")
+			recommendation := strings.Split(response, "$$-+Recommendations+-$$")[1]
+			resp = map[string]interface{}{
+				"recommendation": recommendation,
+			}
+		} else {
+			resp = map[string]interface{}{
+				"chunk": response,
+			}
 		}
 		c.SSEvent("message", resp)
 		c.Writer.Flush()

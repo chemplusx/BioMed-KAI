@@ -197,8 +197,8 @@ class LlamaCppModel:
         # After generating the main response, add recommendations
         # print("Recommendations: ", response)
         print("Recommendations: ", recommendations)
-        # if recommendations:
-        #     yield "$$-+Recommendations+-$$" + str(recommendations)
+        if recommendations:
+            yield "$$-+Recommendations+-$$" + str(recommendations)
 
     async def call_model(self, prompt, state, callback=None):
         print("Enhanced Prompt: ", prompt)
