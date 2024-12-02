@@ -662,6 +662,9 @@
             recommendationSection.innerHTML = ''; // Clear existing recommendations
 
             recommendations = recommendations.substring(2, recommendations.length - 2).split("', '")
+            if (recommendations.length === 1) {
+                recommendations = recommendations[0].split("\", \"")
+            }
 
             // <div id="recommendation-section" class="grid grid-cols-2 gap-4 mb-4">
             //         <div class="sample-input text-gray-300 rounded-lg p-3 cursor-pointer text-sm">
