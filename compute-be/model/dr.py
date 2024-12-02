@@ -7,7 +7,7 @@ import spacy
 from spacy.tokens import Doc, Span
 
 # Load spaCy model for entity detection
-nlp = spacy.load("en_ner_bionlp13cg_md")
+nlp = spacy.load("en_core_sci_md")
 uri = "neo4j://localhost:7687"
 username = "neo4j"
 password = "password"
