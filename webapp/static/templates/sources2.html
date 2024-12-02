@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BioMed-KAI - Sources and References</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/2.8.2/alpine.js" defer></script>
+    <!-- <link href="css/styles.css" rel="stylesheet"> -->
+    <style>
+        /* Base styles */
+        html,
+        body {
+            height: 100%;
+            background-color: #0F172A;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Wave Animation Styles */
+        .wave-header {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(45deg, #0F172A, #1E3A8A);
+            /* padding-bottom: 100px; */
+        }
+
+        .wave-container {
+            position: absolute;
+            width: 200%;
+            height: 100%;
+            bottom: 0;
+            left: 0;
+            animation: wave-move 20s linear infinite;
+            transform: translateZ(0);
+        }
+
+        .wave {
+            position: relative;
+            float: left;
+            width: 50%;
+            height: 100%;
+            background-repeat: repeat-x;
+            background-position: 0 bottom;
+        }
+
+        .wave-container-1 {
+            opacity: 0.3;
+            animation-duration: 18s;
+        }
+
+        .wave-container-1 .wave {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 88.7'%3E%3Cpath d='M800 56.9c-155.5 0-204.9-50-405.5-49.9-200 0-250 49.9-394.5 49.9v31.8h800v-.2-31.6z' fill='%232563EB'/%3E%3C/svg%3E");
+        }
+
+        .wave-container-2 {
+            opacity: 0.6;
+            animation-duration: 15s;
+        }
+
+        .wave-container-2 .wave {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 88.7'%3E%3Cpath d='M800 56.9c-155.5 0-204.9-50-405.5-49.9-200 0-250 49.9-394.5 49.9v31.8h800v-.2-31.6z' fill='%231D4ED8'/%3E%3C/svg%3E");
+        }
+
+        .wave-container-3 {
+            opacity: 0.9;
+            animation-duration: 12s;
+        }
+
+        .wave-container-3 .wave {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 88.7'%3E%3Cpath d='M800 56.9c-155.5 0-204.9-50-405.5-49.9-200 0-250 49.9-394.5 49.9v31.8h800v-.2-31.6z' fill='%231E40AF'/%3E%3C/svg%3E");
+        }
+
+        @keyframes wave-move {
+            0% {
+                transform: translateX(0) translateZ(0);
+            }
+
+            100% {
+                transform: translateX(-50%) translateZ(0);
+            }
+        }
+
+        .sidebar {
+            background-color: #0F172A;
+        }
+
+        .glow-text {
+            text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+        }
+
+        .fade-in {
+            opacity: 0;
+            animation: fadeIn 1s forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+
+        .highlight {
+            animation: highlight 1.5s ease-out;
+        }
+
+        @keyframes highlight {
+            from {
+                background-color: rgba(59, 130, 246, 0.6);
+                /* Light blue highlight */
+            }
+
+            to {
+                background-color: rgba(30, 41, 59, 0.5);
+                /* Default background */
+            }
+        }
+
+        .card-color {
+            color: black;
+            --tw-bg-opacity: 1;
+            background-color: rgb(201 214 255)
+        }
+    </style>
+</head>
+
+<body class="bg-custom-dark text-gray-100" x-data="{ sidebarOpen: false }">
+    <!-- Sidebar -->
+    <div class="sidebar fixed top-0 left-0 h-full w-64 transform transition-transform duration-300 ease-in-out z-50"
+        :class="{ 'translate-x-0': sidebarOpen, '-translate-x-full': !sidebarOpen }">
+        <div class="p-6">
+            <img src="static/BioMed-KAI-logo.png" alt="BioMed-KAI Logo" class="h-30 mb-8 filter invert">
+            <nav>
+                <ul class="space-y-4">
+                    <li><a href="home"
+                            class="text-gray-300 px-5 block py-2 hover:bg-blue-600 rounded transition duration-300">Home</a>
+                    </li>
+                    <li><a href="midas"
+                            class="text-white font-semibold px-5 block py-2 bg-blue-600 rounded transition duration-300">BioMed-KAI</a>
+                    </li>
+                    <li><a href="source"
+                            class="text-gray-300 px-5 block py-2 hover:bg-blue-600 rounded transition duration-300">Knowledge
+                            Graph</a></li>
+                    <!-- <li><a href="about"
+                        class="text-gray-300 px-5 block py-2 hover:bg-blue-600 rounded transition duration-300">About</a>
+                </li> -->
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    <div class="overlay fixed inset-0 bg-black opacity-50 z-40" x-show="sidebarOpen" @click="sidebarOpen = false"></div>
+
+    <main class="flex-grow">
+        <section class="wave-header text-white py-16">
+            <div class="wave-container wave-container-1">
+                <div class="wave"></div>
+                <div class="wave"></div>
+            </div>
+            <div class="wave-container wave-container-2">
+                <div class="wave"></div>
+                <div class="wave"></div>
+            </div>
+            <div class="wave-container wave-container-3">
+                <div class="wave"></div>
+                <div class="wave"></div>
+            </div>
+
+            <div class="sidebar-toggle absolute top-4 left-4 z-50" @click="sidebarOpen = !sidebarOpen">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </div>
+            <div class="container mx-auto px-6 text-center relative z-10">
+                <h1 class="text-5xl md:text-6xl font-bold mb-4 glow-text">BioMed-KAI Chat</h1>
+                <p class="text-2xl mb-8 text-blue-400 glow-text">Your AI-Powered Precision Medicine Assistant</p>
+            </div>
+        </section>
+
+
+
+        <section class="py-20">
+            <div class="container mx-auto px-6">
+                <div class="mb-16">
+                    <h2 class="text-3xl font-bold mb-8 text-center">
+                        <i class="fas fa-database mr-2 text-blue-600"></i>Databases (21)
+                    </h2>
+                    <div id="cardContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <!-- Add more database cards here -->
+                    </div>
+                </div>
+
+                <div>
+                    <h2 class="text-3xl font-bold mb-8 text-center">
+                        <i class="fas fa-project-diagram mr-2 text-purple-600"></i>Ontologies (15)
+                    </h2>
+                    <div id="ontologyContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <!-- Add more ontology cards here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-6 text-center">
+            <p>&copy; 2024 BioMed-KAI. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        const databases = [
+            {
+                "Datasource": "Uberon (Uber-anatomy Ontology)",
+                "Version": "2024-09-03",
+                "Data Access": "File Download: https://obophenotype.github.io/uberon/current_release/",
+                "Type": "Anatomy"
+            },
+            {
+                "Datasource": "UniProt (Universal Protein Resource)",
+                "Version": "v07-2024",
+                "Data Access": "FTP Access: https://ftp.uniprot.org/pub/databases/uniprot/current_release/",
+                "Type": "Protein"
+            },
+            {
+                "Datasource": "OpenTargets",
+                "Version": "24.06",
+                "Data Access": "FTP Access: http://ftp.ebi.ac.uk/pub/databases/opentargets/platform",
+                "Type": "Genomics"
+            },
+            {
+                "Datasource": "Ensembl",
+                "Version": "112",
+                "Data Access": "FTP Access: https://ftp.ensembl.org/pub/current_genbank/",
+                "Type": "Genomics"
+            },
+            {
+                "Datasource": "HGNC (HUGO Gene Nomenclature Committee)",
+                "Version": "v2024-08-23",
+                "Data Access": "File Download: https://www.genenames.org/download/statistics-and-files/",
+                "Type": "Genomics"
+            },
+            {
+                "Datasource": "ChEBI (Chemical Entities of Biological Interest)",
+                "Version": "v08-2024",
+                "Data Access": "SQL DUmp: https://www.ebi.ac.uk/chebi/downloadsForward.do",
+                "Type": "Chemical"
+            },
+            {
+                "Datasource": "InACT (Interaction Network Analysis Computational Tool)",
+                "Version": "v2024-05-20",
+                "Data Access": "FTP access: https://www.ebi.ac.uk/intact/download/ftp",
+                "Type": "Protein"
+            },
+            {
+                "Datasource": "TTD (Therapeutic Target Database)",
+                "Version": "10.1.01",
+                "Data Access": "File Download: https://idrblab.net/ttd/full-data-download",
+                "Type": "Drug"
+            },
+            {
+                "Datasource": "Marker DB",
+                "Version": "2",
+                "Data Access": "File Download: https://markerdb.ca/downloads",
+                "Type": "Genomics"
+            },
+            {
+                "Datasource": "DrugBank",
+                "Version": "5.1.12",
+                "Data Access": "File Download: Access on request",
+                "Type": "Drug"
+            },
+            {
+                "Datasource": "DrugCentral",
+                "Version": "v2023-05",
+                "Data Access": "SQL Dump: https://drugcentral.org/ActiveDownload",
+                "Type": "Drug"
+            },
+            {
+                "Datasource": "GWAS Catalog (Genome-Wide Association Studies Catalog)",
+                "Version": "V1.0.3.1",
+                "Data Access": "File Download: https://www.ebi.ac.uk/gwas/docs/file-downloads",
+                "Type": "Studies"
+            },
+            {
+                "Datasource": "HPA (Human Protein Atlas)",
+                "Version": "23",
+                "Data Access": "File Download: https://www.proteinatlas.org/about/download",
+                "Type": "Protein"
+            },
+            {
+                "Datasource": "Reactome",
+                "Version": "v89",
+                "Data Access": "File Download: https://reactome.org/download-data",
+                "Type": "Pathways"
+            },
+            {
+                "Datasource": "dbSNP (Database of Single Nucleotide Polymorphisms)",
+                "Version": "v2023-01-25",
+                "Data Access": "FTP Access: https://ftp.ncbi.nih.gov/snp/",
+                "Type": "Genomics"
+            },
+            {
+                "Datasource": "HMDB (Human Metabolome Database)",
+                "Version": "v5",
+                "Data Access": "File Download: https://hmdb.ca/downloads",
+                "Type": "Metabolomics"
+            },
+            {
+                "Datasource": "PubMed",
+                "Version": "v2023-12-15",
+                "Data Access": "FTP Access: https://ftp.ncbi.nlm.nih.gov/pubmed/baseline/",
+                "Type": "Studies"
+            },
+            {
+                "Datasource": "EMBL-EBI (European Molecular Biology Laboratory-European Bioinformatics Institute)",
+                "Version": "v2024_04",
+                "Data Access": "Rest API + SparQL: https://www.ebi.ac.uk/services",
+                "Type": "Database"
+            },
+            {
+                "Datasource": "BioStudies",
+                "Version": "v2024-08",
+                "Data Access": "Rest API Access: https://www.ebi.ac.uk/biostudies/api/v1/search",
+                "Type": "Studies"
+            },
+            {
+                "Datasource": "PDB (Protein Data Bank)",
+                "Version": "v2024-08-30",
+                "Data Access": "FTP Access: ftp://ftp.wwpdb.org/",
+                "Type": "Protein"
+            },
+            {
+                "Datasource": "NCBI (National Center for Biotechnology Information)",
+                "Version": "v2023-12-07",
+                "Data Access": "FTP access: https://ftp.ncbi.nlm.nih.gov/",
+                "Type": "Database"
+            }
+        ];
+
+
+        const ontologies = [
+            {
+                "Ontology": "MonDO (Monarch Disease Ontology)",
+                "Version": "v2024-09-03",
+                "Data Access": "File Download: https://monarchinitiative.org/ontology/mondo.owl",
+                "Type": "Disease"
+            },
+            {
+                "Ontology": "Uberon (Uber-anatomy Ontology)",
+                "Version": "2024-09-03",
+                "Data Access": "File Download: https://obophenotype.github.io/uberon/current_release/",
+                "Type": "Anatomy"
+            },
+            {
+                "Ontology": "PO (Protein Ontology)",
+                "Version": "v2024-08-30",
+                "Data Access": "File Download: http://purl.obolibrary.org/obo/po.owl",
+                "Type": "Protein"
+            },
+            {
+                "Ontology": "GO (Gene Ontology)",
+                "Version": "v2024-09-01",
+                "Data Access": "File Download: http://purl.obolibrary.org/obo/go.owl",
+                "Type": "Gene"
+            },
+            {
+                "Ontology": "HPO (Human Phenotype Ontology)",
+                "Version": "v2024-09-01",
+                "Data Access": "File Download: http://purl.obolibrary.org/obo/hp.owl",
+                "Type": "Phenotype"
+            },
+            {
+                "Ontology": "EFO (Experimental Factor Ontology)",
+                "Version": "v2024-09-01",
+                "Data Access": "File Download: http://purl.obolibrary.org/obo/efo.owl",
+                "Type": "Experimental Factor"
+            },
+            {
+                "Ontology": "ChEBI ontology",
+                "Version": "v2024-09-01",
+                "Data Access": "File Download: http://purl.obolibrary.org/obo/chebi.owl",
+                "Type": "Chemical"
+            },
+            {
+                "Ontology": "HDO (Human Disease Ontology)",
+                "Version": "v2024-09-01",
+                "Data Access": "File Download: http://purl.obolibrary.org/obo/doid.owl",
+                "Type": "Disease"
+            },
+            {
+                "Ontology": "SNOMED CT (Systematized Nomenclature of Medicine - Clinical Terms)",
+                "Version": "v2024-09-01",
+                "Data Access": "File Download: http://purl.obolibrary.org/obo/snomed.owl",
+                "Type": "Drug"
+            },
+            {
+                "Ontology": "Food Ontology",
+                "Version": "v2024-09-01",
+                "Data Access": "File Download: http://purl.obolibrary.org/obo/foodon.owl",
+                "Type": "Food"
+            },
+            {
+                "Ontology": "Symptom Ontology",
+                "Version": "v2024-09-01",
+                "Data Access": "File Download: http://purl.obolibrary.org/obo/symp.owl",
+                "Type": "Symptom"
+            },
+            {
+                "Ontology": "Orphanet",
+                "Version": "v2024-09-01",
+                "Data Access": "File Download: http://purl.obolibrary.org/obo/orphanet.owl",
+                "Type": "Disease"
+            },
+            {
+                "Ontology": "OMIM (Online Mendelian Inheritance in Man)",
+                "Version": "v2024-09-01",
+                "Data Access": "File Download: http://purl.obolibrary.org/obo/omim.owl",
+                "Type": "Disease"
+            }
+        ]
+        function getIconClass(dataSource) {
+            const lowerCaseSource = dataSource.toLowerCase();
+            if (lowerCaseSource.includes('protein') || lowerCaseSource.includes('gene')) return 'fa-dna';
+            if (lowerCaseSource.includes('drug') || lowerCaseSource.includes('chemical')) return 'fa-capsules';
+            if (lowerCaseSource.includes('study') || lowerCaseSource.includes('pubmed')) return 'fa-book-medical';
+            if (lowerCaseSource.includes('database') || lowerCaseSource.includes('catalog')) return 'fa-database';
+            if (lowerCaseSource.includes('pathway')) return 'fa-sitemap';
+            if (lowerCaseSource.includes('metabol')) return 'fa-flask';
+            if (lowerCaseSource.includes('anatomy')) return 'fa-brain';
+            if (lowerCaseSource.includes('ontology')) return 'fa-project-diagram';
+            if (lowerCaseSource.includes('interaction')) return 'fa-handshake';
+            if (lowerCaseSource.includes('target')) return 'fa-bullseye';
+            if (lowerCaseSource.includes('gwas')) return 'fa-chart-bar';
+            if (lowerCaseSource.includes('disease')) return 'fa-procedures';
+
+            return 'fa-microscope';
+        }
+
+        function createCard(item) {
+            const [accessType, url] = item["Data Access"].split(': ');
+            const iconClass = getIconClass(item.Type);
+
+            return `
+                <div class="card-color rounded-lg shadow-lg p-6 source-card">
+                    <div class="flex items-center mb-4">
+                        <i class="fas ${iconClass} text-3xl text-blue-600 mr-4"></i>
+                        <h3 class="text-xl font-semibold">${(item.Datasource || item.Ontology).split(' (')[0]}</h3>
+                    </div>
+                    <p class="text-gray-600 mb-2">${(item.Datasource || item.Ontology).includes('(') ? (item.Datasource || item.Ontology).split('(')[1].replace(')', '') : ''}</p>
+                    <p class="text-sm text-gray-500 mb-4">Version: ${item.Version}</p>
+                    <a href="${url}" class="text-blue-600 hover:underline flex items-center" target="_blank" rel="noopener noreferrer">
+                        <i class="fas fa-external-link-alt mr-2"></i>${accessType}
+                    </a>
+                </div>
+            `;
+        }
+
+        const cardContainer = document.getElementById('cardContainer');
+        databases.forEach(item => {
+            cardContainer.innerHTML += createCard(item);
+        });
+
+        const ontologyContainer = document.getElementById('ontologyContainer');
+        ontologies.forEach(item => {
+            ontologyContainer.innerHTML += createCard(item);
+        });
+    </script>
+</body>
+
+</html>

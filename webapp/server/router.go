@@ -13,7 +13,7 @@ func InitRouter(r *gin.Engine) {
 	r.StaticFile("/home", "./static/templates/home2.html")
 	// r.StaticFile("/midas", "./static/templates/midas.html")
 	r.StaticFile("/midas", "./static/templates/midas2.html")
-	r.StaticFile("/source", "./static/templates/sources.html")
+	r.StaticFile("/source", "./static/templates/sources2.html")
 	r.StaticFile("/about", "./static/templates/about.html")
 	r.StaticFile("/contact", "./static/templates/contact.html")
 
