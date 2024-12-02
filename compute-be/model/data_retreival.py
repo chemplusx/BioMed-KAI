@@ -128,6 +128,7 @@ def fetch_context(parameters):
         #     print(f"Score: {result['score']}")
         #     print(f"Metadata: {result['metadata']}")
         #     print("---")
+        print("Query:", query, "Label:", label, "Parameters:", parameters)
         yaml_results = hybrid_search(driver, query, index, keyword_index)
         print("YAML Results:", yaml_results)
         formatted_yaml = format_yaml_for_llm(yaml_results)

@@ -7,7 +7,7 @@ import spacy
 from spacy.tokens import Doc, Span
 
 # Load spaCy model for entity detection
-nlp = spacy.load("en_core_sci_md")
+nlp = spacy.load("en_ner_bionlp13cg_md")
 uri = "neo4j://localhost:7687"
 username = "neo4j"
 password = "password"
@@ -238,7 +238,7 @@ def detect_entities_from_index(text: str) -> List[Dict[str, str]]:
         # } as result
         # ORDER BY result.score DESC
         # """
-        embedding = model.encode(text[0]).tolist()
+        embedding = model.encode(text).tolist()
         cypher_query = """
         CALL db.index.vector.queryNodes($index, $k, $embedding) 
                 YIELD node, score WHERE score > 0.8
@@ -296,7 +296,8 @@ def fetch_context(parameters: Dict[str, Any]) -> Dict[str, Any]:
         processed_query = preprocess_query(query)
         
         # First, try to detect entities using Neo4j index
-        detected_entities = detect_entities_from_index(processed_query)
+        print("Processed query:", processed_query)
+        detected_entities = detect_entities_from_index(query)
         
         if not detected_entities:
             print(f"No entities detected for query: {query}")
