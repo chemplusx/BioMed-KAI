@@ -39,7 +39,9 @@ def llama_cpp_lib():
     #     return llama_cpp
     # elif shared.args.tensorcores and llama_cpp_cuda_tensorcores is not None:
     #     return llama_cpp_cuda_tensorcores
-    if llama_cpp_cuda is not None:
+    if llama_cpp_cuda_tensorcores is not None:
+        return llama_cpp_cuda_tensorcores
+    elif llama_cpp_cuda is not None:
         return llama_cpp_cuda
     else:
         return llama_cpp
@@ -60,8 +62,11 @@ def custom_token_ban_logits_processor(token_ids, input_ids, logits):
 class LlamaCppModel:
     models = {
             'llama-3': 'H:\\workspace\\NEXIS\\src\\models\\Meta-Llama-3-8B-Instruct.Q8_0.gguf',
-            'llama-3.1': 'H:\\workspace\\NEXIS\\src\\models\\Meta-Llama-3.1-8B-Instruct-Q6_K_L.gguf', #'H:\\workspace\\NEXIS\\src\\models\\Meta-Llama-3.1-8B-Instruct-Q8_0.gguf',
+            # 'llama-3.1': 'H:\\workspace\\NEXIS\\src\\models\\Meta-Llama-3.1-8B-Instruct-Q6_K_L.gguf',
+            'llama-3.1': 'H:\\workspace\\text-generation-webui\\models\\Meta-Llama-3.1-8B-Instruct-Q8_0.gguf',
+            # 'llama-3.1': 'H:\\workspace\\NEXIS\\src\\models\\Meta-Llama-3.1-8B-Instruct-f32.gguf',
             'llama-3.2': 'H:\\workspace\\NEXIS\\src\\models\\Llama-3.2-3B-Instruct-uncensored-Q8_0.gguf',
+            'llama-3.3': 'H:\\workspace\\NEXIS\\src\\models\\Llama-3.3-70B-Instruct-IQ1_M.gguf',
         }
     model_name = 'llama-3.1'
     def __init__(self, model_name='llama-3.1'):
@@ -158,6 +163,27 @@ class LlamaCppModel:
             prompt = prompt.replace("/", "//")
         return prompt            
     
+    async def generate1(self, prompt, state, callback=None):
+        context, recommendations = fetch_context({"text": prompt})
+        print("Context: ", context)
+        # print("Recommendations: ", recommendations)
+        # Prepare the enhanced prompt with context
+        enhanced_prompt = prompt
+        if context:
+            enhanced_prompt = f"""
+            Context:
+            {context}
+            
+            User Question: {prompt}
+            """
+        
+        # Generate response using the model
+        response = ""
+        async for chunk in self.call_model(enhanced_prompt, state, callback):
+            response += chunk
+        
+        return response
+
 
     async def generate2(self, prompt: str, state, callback=None):
         """
@@ -229,6 +255,61 @@ class LlamaCppModel:
             """<|eot_id|>
             <|start_header_id|>assistant<|end_header_id|>
         """
+
+        # input = """
+        #     <|begin_of_text|><|start_header_id|>system<|end_header_id|>
+        #     You are MIDAS, A medical chat assistant, who answers user queries like a professional Medical Expert.
+        #     Additional context may be provided and use that to improve the accuracy response.
+        #     When using the context, no need to apologize for not knowing the answer, just answer the query and do not mention `based on the context provided` or `based on the search result` etc.
+        #     Always respond in a professional manner and provide accurate information in markdown format.
+        #     <|eot_id|>
+        #     <|start_header_id|>user<|end_header_id|>
+        #     Question: """ + prompt + \
+        #     """<|eot_id|>
+        #     <|start_header_id|>assistant<|end_header_id|>
+        # """
+
+        # input = """
+        #     <|begin_of_text|><|start_header_id|>system<|end_header_id|>
+        #     You are MIDAS, A medical chat assistant, who answers user queries like a professional Medical Expert.
+        #     You are given a question with a few options. Answer the question by correctly choosing from the given options.
+        #     Additional context may be provided and use that to improve the accuracy of the response.
+        #     Answer the QA question by correctly choosing from the given options.
+            
+        #     For Example:
+        #     Question: A junior orthopaedic surgery resident is completing a carpal tunnel repair with the department chairman as the attending physician. During the case, the resident inadvertently cuts a flexor tendon. The tendon is repaired without complication. The attending tells the resident that the patient will do fine, and there is no need to report this minor complication that will not harm the patient, as he does not want to make the patient worry unnecessarily. He tells the resident to leave this complication out of the operative report. Which of the following is the correct next action for the resident to take?
+        #     Options: {
+        #         "A": "Disclose the error to the patient but leave it out of the operative report", 
+        #         "B": "Disclose the error to the patient and put it in the operative report", 
+        #         "C": "Tell the attending that he cannot fail to disclose this mistake", 
+        #         "D": "Report the physician to the ethics committee", 
+        #         "E": "Refuse to dictate the operative report"
+        #     }
+
+        #     Answer: Option C) Tell the attending that he cannot fail to disclose this mistake
+        #     <|eot_id|>
+        #     <|start_header_id|>user<|end_header_id|>
+        #     Question: """ + prompt + \
+        #     """<|eot_id|>
+        #     <|start_header_id|>assistant<|end_header_id|>
+        # """
+
+        # input = """
+        #     <|begin_of_text|><|start_header_id|>system<|end_header_id|>
+        #     You are MIDAS, A medical chat assistant, who answers user queries like a professional Medical Expert.
+        #     You are given a question to which you need to provide brief answers.
+        #     Additional context may be provided and use that to improve the accuracy of the response.
+            
+        #     For Eg:
+        #     Question: What is the relationship between very low Mg2+ levels, PTH levels, and Ca2+ levels?
+        #     Answer: Very low Mg2+ levels correspond to low PTH levels which in turn results in low Ca2+ levels..
+        #     <|eot_id|>
+        #     <|start_header_id|>user<|end_header_id|>
+        #     Question: """ + prompt + \
+        #     """<|eot_id|>
+        #     <|start_header_id|>assistant<|end_header_id|>
+        # """
+
 
         # pp = """
         #     You are a medical chat assistant who answers user queries like a professional Medical Expert.
