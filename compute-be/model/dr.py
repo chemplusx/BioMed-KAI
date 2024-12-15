@@ -290,7 +290,7 @@ def fetch_context(parameters: Dict[str, Any]) -> Dict[str, Any]:
         
         # If no query provided, return empty result
         if not query:
-            return ""
+            return "", None
         
         # Preprocess the query
         processed_query = preprocess_query(query)
@@ -301,7 +301,7 @@ def fetch_context(parameters: Dict[str, Any]) -> Dict[str, Any]:
         
         if not detected_entities:
             print(f"No entities detected for query: {query}")
-            return ""
+            return "", None
         
         # Use the highest scoring entity
         best_match = detected_entities[0]
@@ -334,7 +334,7 @@ def fetch_context(parameters: Dict[str, Any]) -> Dict[str, Any]:
         
     except Exception as e:
         print(f"Error in fetch_context: {str(e)}")
-        return ""
+        return "", None
 
 def detect_medical_entities(text: str) -> List[Dict[str, str]]:
     """
