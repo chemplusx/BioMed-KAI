@@ -125,15 +125,22 @@ def create_boxplot(data_dict, ax, title, metric="Score", zero_shot_models=['OS',
     # Add legend with full model names
     if show_legend:
         legend_labels = {
-            'OS': 'OneShot Knowledge',
-            'D': 'Diagnostic',
-            'IDM': 'In-Depth Medical Knowledge',
-            'MA': 'Med-Alpaca'
+            'OS': '\nGeneral Medical QA\nShort Answering\n',
+            'D': '\nDiagnostic Query\n',
+            'IDM': '\nIn-Depth Medical Knowledge\nLong Answering\n',
+            'MA': '\nMed-Alpaca\n'
         }
         legend_elements = [plt.Line2D([0], [0], color=v['color'], marker=v['marker'],
-                                    label=legend_labels[k], markersize=8, linestyle='None')
+                                    label=legend_labels[k], markersize=10, linestyle='None')
                          for k, v in data_dict.items()]
-        ax.legend(handles=legend_elements, loc='center left', bbox_to_anchor=(1, 0.5))
+        leg = ax.legend(handles=legend_elements, 
+                       loc='center left', 
+                       bbox_to_anchor=(1.05, 0.5),
+                       prop={'size': 12},  # Increased font size
+                       markerscale=1.5)    # Increased marker size
+        # Increase spacing between legend entries
+        leg._legend_box.sep = 12
+        plt.setp(leg.get_texts(), linespacing=1.5)  # Increase line spacing
 
 # Create the box plots
 create_boxplot(eval_metrics_sim, ax1, 'Semantic Relevance')
