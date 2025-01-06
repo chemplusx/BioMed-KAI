@@ -1,2 +1,2 @@
-# MIDAS
-Medical Intelligence Driven Assistance System
+# BIOMed-KAI
+Biomedicine Knowledge-Aided Intelligence
