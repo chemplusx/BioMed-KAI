@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,32 +7,26 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/2.8.2/alpine.js" defer></script>
-    <!-- <link href="css/styles.css" rel="stylesheet"> -->
+    <link href="css/styles.css" rel="stylesheet">
     <style>
-        /* Base styles */
-        html,
-        body {
-            height: 100%;
+        /* Previous non-wave styles remain the same */
+        .bg-custom-dark {
             background-color: #0F172A;
         }
 
-        body {
-            display: flex;
-            flex-direction: column;
+        .bg-custom-darker {
+            background-color: #090E1A;
         }
 
-        main {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
+        .card-gradient {
+            background: linear-gradient(180deg, rgba(30, 41, 59, 0.5) 0%, rgba(15, 23, 42, 0.5) 100%);
         }
 
-        /* Wave Animation Styles */
+        /* Updated Wave Animation Styles */
         .wave-header {
             position: relative;
             overflow: hidden;
             background: linear-gradient(45deg, #0F172A, #1E3A8A);
-            /* padding-bottom: 100px; */
         }
 
         .wave-container {
@@ -92,74 +85,32 @@
             }
         }
 
-        .sidebar {
-            background-color: #0F172A;
-        }
-
         .glow-text {
             text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
         }
-
-        .fade-in {
-            opacity: 0;
-            animation: fadeIn 1s forwards;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
-            }
-        }
-
-
-        .highlight {
-            animation: highlight 1.5s ease-out;
-        }
-
-        @keyframes highlight {
-            from {
-                background-color: rgba(59, 130, 246, 0.6);
-                /* Light blue highlight */
-            }
-
-            to {
-                background-color: rgba(30, 41, 59, 0.5);
-                /* Default background */
-            }
-        }
-
-        .card-color {
-            color: black;
-            --tw-bg-opacity: 1;
-            background-color: rgb(201 214 255)
-        }
     </style>
 </head>
+<body class="font-sans text-gray-800 flex flex-col min-h-screen bg-gray-100" x-data="{ sidebarOpen: false }">
 
-<body class="bg-custom-dark text-gray-100" x-data="{ sidebarOpen: false }">
-    <!-- Sidebar -->
-    <div class="sidebar fixed top-0 left-0 h-full w-64 transform transition-transform duration-300 ease-in-out z-50"
+    <div class="fixed top-0 left-0 h-full w-64 bg-custom-darker transform transition-transform duration-300 ease-in-out z-50"
         :class="{ 'translate-x-0': sidebarOpen, '-translate-x-full': !sidebarOpen }">
         <div class="p-6">
+            <!-- <img src="static/midas-logo.png" alt="BioMed-KAI Logo" class="h-30 mb-8 filter invert"> -->
             <img src="static/BioMed-KAI-logo.png" alt="BioMed-KAI Logo" class="h-30 mb-8 filter invert">
             <nav>
-                <ul class="space-y-4">
-                    <li><a href="home"
-                            class="text-gray-300 px-5 block py-2 hover:bg-blue-600 rounded transition duration-300">Home</a>
+                <ul class="space-y-2">
+                    <li>
+                        <a href="home" class="text-white font-semibold px-4 py-2 block bg-blue-600 rounded">Home</a>
                     </li>
-                    <li><a href="midas"
-                            class="text-white font-semibold px-5 block py-2 bg-blue-600 rounded transition duration-300">BioMed-KAI</a>
+                    <li>
+                        <a href="midas" class="text-gray-400 px-4 py-2 block hover:bg-gray-800 rounded">BioMed-KAI</a>
                     </li>
-                    <li><a href="source"
-                            class="text-gray-300 px-5 block py-2 hover:bg-blue-600 rounded transition duration-300">Knowledge
-                            Graph</a></li>
-                    <!-- <li><a href="about"
-                        class="text-gray-300 px-5 block py-2 hover:bg-blue-600 rounded transition duration-300">About</a>
-                </li> -->
+                    <li>
+                        <a href="source" class="text-gray-400 px-4 py-2 block hover:bg-gray-800 rounded">Knowledge Graph</a>
+                    </li>
+                    <li>
+                        <a href="about" class="text-gray-400 px-4 py-2 block hover:bg-gray-800 rounded">About</a>
+                    </li>
                 </ul>
             </nav>
         </div>
@@ -167,8 +118,14 @@
 
     <div class="overlay fixed inset-0 bg-black opacity-50 z-40" x-show="sidebarOpen" @click="sidebarOpen = false"></div>
 
+    
+    </div>
+
+    <div class="overlay fixed inset-0 bg-black opacity-50 z-40" x-show="sidebarOpen" @click="sidebarOpen = false"></div>
+
     <main class="flex-grow">
-        <section class="wave-header text-white py-16">
+        <section class="wave-header relative py-10">
+            <!-- New wave structure -->
             <div class="wave-container wave-container-1">
                 <div class="wave"></div>
                 <div class="wave"></div>
@@ -182,7 +139,7 @@
                 <div class="wave"></div>
             </div>
 
-            <div class="sidebar-toggle absolute top-4 left-4 z-50" @click="sidebarOpen = !sidebarOpen">
+            <div class="sidebar-toggle absolute top-4 left-4 z-50 text-gray-400" @click="sidebarOpen = !sidebarOpen">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="3" y1="12" x2="21" y2="12"></line>
@@ -191,12 +148,19 @@
                 </svg>
             </div>
             <div class="container mx-auto px-6 text-center relative z-10">
-                <h1 class="text-5xl md:text-6xl font-bold mb-4 glow-text">BioMed-KAI Chat</h1>
-                <p class="text-2xl mb-8 text-blue-400 glow-text">Your AI-Powered Precision Medicine Assistant</p>
+                <h1 class="text-5xl md:text-6xl font-bold mb-4 glow-text">BioMed-KAI</h1>
+                <p class="text-3xl font-bold mb-8 text-blue-400 glow-text">(Biomedicine Knowledge-Aided Intelligence)
+                </p>
+                <p class="text-2xl mb-8 text-gray-300">Enhancing Precision Medicine with AI-Driven Insights and
+                    Knowledge Integration</p>
+                <a href="midas"
+                    class="bg-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-blue-700 transition duration-300 shadow-lg hover:shadow-xl">
+                    Chat with BioMed-KAI
+                </a>
             </div>
         </section>
 
-
+        
 
         <section class="py-20">
             <div class="container mx-auto px-6">
@@ -214,6 +178,28 @@
                         <i class="fas fa-project-diagram mr-2 text-purple-600"></i>Ontologies (15)
                     </h2>
                     <div id="ontologyContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <div class="bg-white rounded-lg shadow-lg p-6 source-card">
+                            <div class="flex items-center mb-4">
+                                <i class="fas fa-brain text-3xl text-purple-600 mr-4"></i>
+                                <h3 class="text-xl font-semibold">Uberon</h3>
+                            </div>
+                            <p class="text-gray-600 mb-2">Uber-anatomy Ontology</p>
+                            <p class="text-sm text-gray-500 mb-4">Version: 2024-09-03</p>
+                            <a href="https://obophenotype.github.io/uberon/current_release/" class="text-purple-600 hover:underline flex items-center">
+                                <i class="fas fa-download mr-2"></i>File Download
+                            </a>
+                        </div>
+                        <div class="bg-white rounded-lg shadow-lg p-6 source-card">
+                            <div class="flex items-center mb-4">
+                                <i class="fas fa-dna text-3xl text-purple-600 mr-4"></i>
+                                <h3 class="text-xl font-semibold">GO</h3>
+                            </div>
+                            <p class="text-gray-600 mb-2">Gene Ontology</p>
+                            <p class="text-sm text-gray-500 mb-4">Version: TBD</p>
+                            <a href="#" class="text-purple-600 hover:underline flex items-center">
+                                <i class="fas fa-info-circle mr-2"></i>More Info
+                            </a>
+                        </div>
                         <!-- Add more ontology cards here -->
                     </div>
                 </div>
@@ -223,7 +209,7 @@
 
     <footer class="bg-gray-800 text-white py-8">
         <div class="container mx-auto px-6 text-center">
-            <p>&copy; 2024 BioMed-KAI. Empowering Precision Medicine with Advanced AI and Dynamic Knowledge Graphs. All rights reserved.</p>
+            <p>&copy; 2024 BioMed-KAI. All rights reserved.</p>
         </div>
     </footer>
 
@@ -366,7 +352,7 @@
                 "Type": "Disease"
             },
             {
-                "Ontology": "Uberon (Uber-anatomy Ontology)",
+                "Ontology": "Uberon",
                 "Version": "2024-09-03",
                 "Data Access": "File Download: https://obophenotype.github.io/uberon/current_release/",
                 "Type": "Anatomy"
@@ -452,16 +438,16 @@
             if (lowerCaseSource.includes('target')) return 'fa-bullseye';
             if (lowerCaseSource.includes('gwas')) return 'fa-chart-bar';
             if (lowerCaseSource.includes('disease')) return 'fa-procedures';
-
+            
             return 'fa-microscope';
         }
 
         function createCard(item) {
             const [accessType, url] = item["Data Access"].split(': ');
             const iconClass = getIconClass(item.Type);
-
+            
             return `
-                <div class="card-color rounded-lg shadow-lg p-6 source-card">
+                <div class="bg-white rounded-lg shadow-lg p-6 source-card">
                     <div class="flex items-center mb-4">
                         <i class="fas ${iconClass} text-3xl text-blue-600 mr-4"></i>
                         <h3 class="text-xl font-semibold">${(item.Datasource || item.Ontology).split(' (')[0]}</h3>
@@ -486,5 +472,4 @@
         });
     </script>
 </body>
-
 </html>
