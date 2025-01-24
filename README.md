@@ -56,6 +56,10 @@ OR
 go build main.go && ./main
 ```
 
+## Setting up KG
+
+Please contact repository owners and request for access to the KG
+
 
 ## Contributing
 
