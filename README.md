@@ -34,7 +34,7 @@ git clone https://github.com/chemplusx/BioMed-KAI.git
 
 # Install dependencies
 cd BioMed-KAI
-cd compute
+cd compute-be
 pip install -r requirements.txt
 
 ```
@@ -46,7 +46,7 @@ In order to run BIOMed-KAI, you would need to run both the backend and the front
 
 ```bash
 # Running the backend Server with AI-Engine
-cd compute
+cd compute-be
 python start.py
 
 # Running the frontend
