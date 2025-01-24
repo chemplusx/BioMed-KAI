@@ -65,10 +65,7 @@ go build main.go && ./main
 
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
-## Security
-
-For security concerns, please email security@medal-ai.com
 
 ## License
 
-This project is licensed under the MIT License - see [LICENSE.md](LICENSE.md)
+This project is licensed under the MIT License - see [LICENSE](LICENSE)
