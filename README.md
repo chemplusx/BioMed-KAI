@@ -4,6 +4,8 @@ Biomedicine Knowledge-Aided Intelligence
 
 BIOMed-KAI is a context-aware precision medicine platform powered by Gen-AI and a dynamic medical knowledge graph, designed to support healthcare professionals in diagnostic decision-making and treatment planning.
 
+The UI can be accessed at http://pitools.niper.ac.in/biomedkai/home
+
 ## Features
 
 - **Gen-AI Integration**: Advanced artificial intelligence for complex medical data analysis
