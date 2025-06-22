@@ -1,0 +1,63 @@
+# Agent Configuration
+agents:
+  supervisor:
+    model: "llama-3.1"
+    temperature: 0.3
+    max_tokens: 1000
+    confidence_threshold: 0.8
+    tools:
+      - entity_extractor
+      - query_classifier
+    routing_rules:
+      emergency_keywords:
+        - chest pain
+        - difficulty breathing
+        - severe bleeding
+        - unconscious
+        - stroke symptoms
+      
+  diagnostic:
+    model: "llama-3.1"
+    temperature: 0.5
+    max_tokens: 2000
+    confidence_threshold: 0.7
+    tools:
+      - symptom_analyzer
+      - knowledge_graph_search
+      - pubmed_search
+      - lab_interpreter
+    high_risk_conditions:
+      - myocardial infarction
+      - stroke
+      - pulmonary embolism
+      - sepsis
+      
+  treatment:
+    model: "llama-3.1"
+    temperature: 0.4
+    max_tokens: 2000
+    confidence_threshold: 0.75
+    tools:
+      - guideline_checker
+      - drug_database
+      - pubmed_search
+    high_risk_medications:
+      - warfarin
+      - insulin
+      - chemotherapy agents
+      - opioids
+      
+  drug_interaction:
+    model: "llama-3.1"
+    temperature: 0.2
+    max_tokens: 1500
+    confidence_threshold: 0.85
+    tools:
+      - interaction_checker
+      - drug_database
+    high_risk_interactions:
+      - warfarin and NSAIDs
+      - insulin and beta-blockers
+      - opioids and benzodiazepines
+      - chemotherapy agents and live vaccines
+      
