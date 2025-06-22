@@ -38,33 +38,42 @@ type Service struct {
 }
 
 type ConversationEntry struct {
-	role string
-	text string
+	Role string `json:"role"`
+	Text string `json:"text"`
 }
 
+// Updated Message struct to match the new backend
 type Message struct {
-	Action  string              `json:"action"`
-	Prompt  string              `json:"prompt,omitempty"`
-	Text    string              `json:"text,omitempty"`
-	History []ConversationEntry `json:"history,omitempty"`
-	Stream  bool                `json:"stream,omitempty"`
+	Action    string                 `json:"action"`
+	Prompt    string                 `json:"prompt,omitempty"`
+	Text      string                 `json:"text,omitempty"`
+	History   []ConversationEntry    `json:"history,omitempty"`
+	Stream    bool                   `json:"stream,omitempty"`
+	UserID    string                 `json:"user_id,omitempty"`
+	SessionID string                 `json:"session_id,omitempty"`
+	Metadata  map[string]interface{} `json:"metadata,omitempty"`
 }
 
+// Updated ResponseMessage struct
 type ResponseMessage struct {
-	Type        string `json:"type"`
-	StreamStart bool   `json:"stream_start,omitempty"`
-	Chunk       string `json:"chunk,omitempty"`
-	StreamEnd   bool   `json:"stream_end,omitempty"`
-	Error       string `json:"error,omitempty"`
+	Type      string                 `json:"type"`
+	Status    string                 `json:"status,omitempty"`
+	Content   string                 `json:"content,omitempty"`
+	Delta     string                 `json:"delta,omitempty"`
+	Done      bool                   `json:"done,omitempty"`
+	Error     string                 `json:"error,omitempty"`
+	MessageID string                 `json:"message_id,omitempty"`
+	Metadata  map[string]interface{} `json:"metadata,omitempty"`
 }
 
+// Updated DefaultConfig to match new backend
 func DefaultConfig() Config {
 	return Config{
-		URL:                  "ws://localhost:8765",
-		MaxReconnectAttempts: 0,
+		URL:                  "ws://localhost:8080/ws/chat", // Updated URL
+		MaxReconnectAttempts: 100,
 		ReconnectDelay:       5 * time.Second,
-		PingPeriod:           5 * time.Second,
-		PongWait:             25 * time.Second,
+		PingPeriod:           30 * time.Second, // Increased ping period
+		PongWait:             60 * time.Second, // Increased pong wait
 		WriteWait:            10 * time.Second,
 		MessageBufferSize:    100,
 	}
@@ -214,6 +223,10 @@ func (s *Service) writePump(errCh chan<- error) {
 		case <-s.ctx.Done():
 			return
 		case <-ticker.C:
+			if !s.IsConnected() {
+				errCh <- fmt.Errorf("websocket is not connected")
+				continue
+			}
 			s.mu.Lock()
 			err := s.conn.WriteControl(websocket.PingMessage, nil, time.Now().Add(s.config.WriteWait))
 			s.mu.Unlock()
@@ -263,6 +276,7 @@ func (s *Service) writeMessage(msg Message) error {
 			return
 		}
 
+		log.Println("Writing message to WebSocket:", string(data))
 		s.conn.SetWriteDeadline(time.Now().Add(s.config.WriteWait))
 		if err := s.conn.WriteMessage(websocket.TextMessage, data); err != nil {
 			log.Printf("Write error: %v", err)
@@ -278,35 +292,33 @@ func (s *Service) writeMessage(msg Message) error {
 	}
 }
 
+// Updated Send method
 func (s *Service) Send(action string, data MIDASRequest, callback func(string, bool)) error {
 	log.Println("Sending message to WebSocket")
 	if !s.IsConnected() {
-		log.Println("WebSocket is not connected")
 		return fmt.Errorf("websocket is not connected")
 	}
 
 	msg := Message{
-		Action: action,
+		Action:    "chat", // Use 'chat' action for the new backend
+		Prompt:    data.Text,
+		Stream:    true,
+		UserID:    data.Id,
+		SessionID: fmt.Sprintf("session_%s", data.Id),
 	}
 
-	if action == "generate" {
-		msg.Action = "GENERATE_RESPONSE"
-		msg.Prompt = data.Text
-		if data.Conversations != nil && len(data.Conversations) > 0 {
-			for _, c := range data.Conversations {
-				role, text := strings.Split(c, "-$$-")[0], strings.Split(c, "-$$-")[1]
+	// Convert conversations to history
+	if data.Conversations != nil && len(data.Conversations) > 0 {
+		for _, c := range data.Conversations {
+			parts := strings.Split(c, "-$$-")
+			if len(parts) == 2 {
 				msg.History = append(msg.History, ConversationEntry{
-					role: role,
-					text: text,
+					Role: parts[0],
+					Text: parts[1],
 				})
 			}
 		}
-		msg.Stream = true
-	} else {
-		msg.Text = data.Text
 	}
-
-	log.Println("Sending message", msg)
 
 	select {
 	case s.messageChannel <- msg:
@@ -314,10 +326,7 @@ func (s *Service) Send(action string, data MIDASRequest, callback func(string, b
 		return fmt.Errorf("timeout sending message")
 	}
 
-	done := make(chan struct{})
-
 	go func() {
-		defer close(done)
 		for {
 			select {
 			case <-s.ctx.Done():
@@ -332,7 +341,7 @@ func (s *Service) Send(action string, data MIDASRequest, callback func(string, b
 					return
 				}
 				callback(response, false)
-			case <-time.After(30 * time.Second):
+			case <-time.After(60 * time.Second): // Increased timeout
 				callback("Response timeout", true)
 				return
 			}
@@ -342,9 +351,70 @@ func (s *Service) Send(action string, data MIDASRequest, callback func(string, b
 	return nil
 }
 
+type AnalysisRequest struct {
+	Input     string   `json:"input"`
+	Specialty string   `json:"specialty"`
+	UserID    string   `json:"userId"`
+	SessionID string   `json:"sessionId"`
+	Files     []string `json:"files,omitempty"`
+}
+
+// Updated SendForAnalysis method
+func (s *Service) SendForAnalysis(action string, data AnalysisRequest, callback func(string, bool)) error {
+	log.Println("Sending analysis message to WebSocket")
+	if !s.IsConnected() {
+		return fmt.Errorf("websocket is not connected")
+	}
+
+	msg := Message{
+		Action:    "chat", // Use 'chat' action for the new backend
+		Prompt:    data.Input,
+		Stream:    true,
+		UserID:    data.UserID,
+		SessionID: data.SessionID,
+		Metadata: map[string]interface{}{
+			"specialty": data.Specialty,
+			"files":     data.Files,
+			"type":      "analysis",
+		},
+	}
+
+	select {
+	case s.messageChannel <- msg:
+	case <-time.After(5 * time.Second):
+		return fmt.Errorf("timeout sending message")
+	}
+
+	go func() {
+		for {
+			select {
+			case <-s.ctx.Done():
+				callback("", true)
+				return
+			case <-s.responseDone:
+				callback("Connection closed", true)
+				return
+			case response := <-s.responseChannel:
+				if response == "<EOR>" {
+					callback("", true)
+					return
+				}
+				callback(response, false)
+			case <-time.After(60 * time.Second): // Increased timeout
+				callback("Response timeout", true)
+				return
+			}
+		}
+	}()
+
+	return nil
+}
+
+// Updated handleResponse to work with new message format
 func (s *Service) handleResponse(message []byte) error {
 	var response ResponseMessage
 	if err := json.Unmarshal(message, &response); err != nil {
+		log.Printf("Unmarshal error: %v", err)
 		return fmt.Errorf("unmarshal error: %w", err)
 	}
 
@@ -357,16 +427,27 @@ func (s *Service) handleResponse(message []byte) error {
 		}
 	}
 
-	switch {
-	case response.StreamStart:
+	log.Println("Received response:", response)
+
+	switch response.Type {
+	case "stream_start":
 		log.Println("Stream started")
-	case response.StreamEnd:
+	case "stream_delta":
+		if response.Delta != "" {
+			return sendResponse(response.Delta)
+		}
+	case "stream_end":
 		return sendResponse("<EOR>")
-	case response.Error != "":
+	case "error":
 		return fmt.Errorf("server error: %s", response.Error)
 	default:
-		if response.Chunk != "" {
-			return sendResponse(response.Chunk)
+		// Handle content field for non-streaming responses
+		if response.Content != "" {
+			return sendResponse(response.Content)
+		}
+		// Handle done field
+		if response.Done {
+			return sendResponse("<EOR>")
 		}
 	}
 
