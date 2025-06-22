@@ -4,333 +4,356 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BioMed-KAI - Immersive Precision Medicine Chat</title>
+    <title>BioMed-KAI - Enhanced Precision Medicine Chat</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/2.8.2/alpine.js" defer></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
     <style>
-        /* Base styles */
-        html,
-        body {
+        /* Enhanced Base Styles */
+        html, body {
             height: 100%;
-            background-color: #0F172A;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         }
 
         body {
             display: flex;
             flex-direction: column;
-        }
-
-        main {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Wave Animation Styles */
-        .wave-header {
-            position: relative;
             overflow: hidden;
-            background: linear-gradient(45deg, #0F172A, #1E3A8A);
-            /* padding-bottom: 100px; */
         }
 
-        .wave-container {
-            position: absolute;
-            width: 200%;
-            height: 100%;
-            bottom: 0;
-            left: 0;
-            animation: wave-move 20s linear infinite;
-            transform: translateZ(0);
+        /* Enhanced Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
         }
 
-        .wave {
-            position: relative;
-            float: left;
-            width: 50%;
-            height: 100%;
-            background-repeat: repeat-x;
-            background-position: 0 bottom;
+        ::-webkit-scrollbar-track {
+            background: rgba(30, 41, 59, 0.3);
+            border-radius: 10px;
         }
 
-        .wave-container-1 {
-            opacity: 0.3;
-            animation-duration: 18s;
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #3b82f6, #6366f1);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .wave-container-1 .wave {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 88.7'%3E%3Cpath d='M800 56.9c-155.5 0-204.9-50-405.5-49.9-200 0-250 49.9-394.5 49.9v31.8h800v-.2-31.6z' fill='%232563EB'/%3E%3C/svg%3E");
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #2563eb, #4f46e5);
         }
 
-        .wave-container-2 {
-            opacity: 0.6;
-            animation-duration: 15s;
+        /* Modern Glassmorphism */
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
         }
 
-        .wave-container-2 .wave {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 88.7'%3E%3Cpath d='M800 56.9c-155.5 0-204.9-50-405.5-49.9-200 0-250 49.9-394.5 49.9v31.8h800v-.2-31.6z' fill='%231D4ED8'/%3E%3C/svg%3E");
+        .glass-strong {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            box-shadow: 0 20px 60px rgba(59, 130, 246, 0.1);
         }
 
-        .wave-container-3 {
-            opacity: 0.9;
-            animation-duration: 12s;
+        /* Enhanced Header */
+        .modern-header {
+            background: linear-gradient(135deg, #0c1426 0%, #1e293b 50%, #3730a3 100%);
+            border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
         }
 
-        .wave-container-3 .wave {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 88.7'%3E%3Cpath d='M800 56.9c-155.5 0-204.9-50-405.5-49.9-200 0-250 49.9-394.5 49.9v31.8h800v-.2-31.6z' fill='%231E40AF'/%3E%3C/svg%3E");
-        }
-
-        @keyframes wave-move {
-            0% {
-                transform: translateX(0) translateZ(0);
-            }
-
-            100% {
-                transform: translateX(-50%) translateZ(0);
-            }
-        }
-
-        /* Chat-specific styles */
+        /* Enhanced Chat Container */
         .chat-container {
             flex: 1;
             overflow-y: auto;
-            height: calc(100vh - 64px - 360px);
-            background-color: #1E293B;
+            overflow-x: hidden;
+            padding: 2rem;
+            background: rgba(15, 23, 42, 0.3);
+            backdrop-filter: blur(10px);
+            scroll-behavior: smooth;
+            height: calc(100vh - 140px);
+            max-height: calc(100vh - 350px);
         }
 
-        .message-appear {
-            animation: fadeIn 0.5s ease-out;
+        /* Message Animations */
+        .message-enter {
+            animation: slideInUp 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
 
-        @keyframes fadeIn {
+        @keyframes slideInUp {
             from {
                 opacity: 0;
-                transform: translateY(20px);
+                transform: translateY(30px) scale(0.95);
             }
-
             to {
                 opacity: 1;
-                transform: translateY(0);
+                transform: translateY(0) scale(1);
             }
         }
 
-        .pulse {
-            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        /* Enhanced Message Bubbles */
+        .user-bubble {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+            border: 1px solid rgba(147, 197, 253, 0.2);
         }
 
-        @keyframes pulse {
+        .ai-bubble {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(51, 65, 85, 0.8));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(59, 130, 246, 0.15);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
 
-            0%,
-            100% {
+        .ai-bubble:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+        }
+
+        /* Pondering Action Styles */
+        .pondering-action {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(99, 102, 241, 0.1));
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            animation: ponderingPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes ponderingPulse {
+            0%, 100% { opacity: 0.8; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.02); }
+        }
+
+        /* Thinking Indicator Enhancement */
+        .thinking-enhanced {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(51, 65, 85, 0.6));
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            animation: thinkingBreathe 3s ease-in-out infinite;
+        }
+
+        @keyframes thinkingBreathe {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        .typing-dots {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .typing-dot {
+            width: 6px;
+            height: 6px;
+            background: #3b82f6;
+            border-radius: 50%;
+            animation: typingDot 1.4s ease-in-out infinite both;
+        }
+
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+        .typing-dot:nth-child(3) { animation-delay: 0s; }
+
+        @keyframes typingDot {
+            0%, 80%, 100% {
+                transform: scale(0.8);
+                opacity: 0.5;
+            }
+            40% {
+                transform: scale(1.2);
                 opacity: 1;
             }
-
-            50% {
-                opacity: .5;
-            }
         }
 
-        /* Enhanced UI Elements */
-        .sample-input {
+        /* Enhanced Input Section */
+        .input-section {
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.9));
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(59, 130, 246, 0.2);
+            box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .chat-input {
+            background: rgba(51, 65, 85, 0.6);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(59, 130, 246, 0.2);
             transition: all 0.3s ease;
-            background-color: rgba(30, 41, 59, 0.5);
-            border: 1px solid rgba(59, 130, 246, 0.3);
         }
 
-        .sample-input:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            background-color: rgba(30, 41, 59, 0.8);
+        .chat-input:focus {
             border-color: rgba(59, 130, 246, 0.6);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+            background: rgba(51, 65, 85, 0.8);
         }
 
-        .markdown-content {
-            color: #E5E7EB;
+        /* Enhanced Buttons */
+        .send-button {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
         }
 
-        .markdown-content code {
-            background-color: rgba(30, 41, 59, 0.5);
-            color: #E5E7EB;
+        .send-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
         }
 
-        .markdown-content pre {
-            background-color: rgba(30, 41, 59, 0.5);
-            color: #E5E7EB;
+        .send-button:active {
+            transform: translateY(0);
         }
 
-        /* .edit-button,
-        .resend-button {
-            background-color: rgba(30, 41, 59, 0.5);
-            color: #E5E7EB;
+        .new-chat-btn {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(99, 102, 241, 0.1));
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            transition: all 0.3s ease;
         }
 
-        .edit-button:hover,
-        .resend-button:hover {
-            background-color: rgba(59, 130, 246, 0.3);
-        } */
-
-        .edit-button,
-        .resend-button {
-            position: absolute;
-            background-color: transparent;
-            /* Remove the background */
-            color: #E5E7EB;
-            /* Light gray color for the icon */
-            border: none;
-            /* Remove any border */
-            font-size: 1rem;
-            /* Adjust icon size if needed */
-            padding: 0.25rem;
-            /* Add padding for spacing */
-            transition: color 0.3s ease;
-            /* Smooth color transition */
+        .new-chat-btn:hover {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(99, 102, 241, 0.2));
+            transform: translateY(-1px);
         }
 
-        .edit-button {
-            margin: -2.8rem 0px 0px 0px;
-        }
-
-        .resend-button {
-            margin: -2.8rem 0px 0px 25px;
-        }
-
-        .edit-button:hover,
-        .resend-button:hover {
-            color: #60A5FA;
-            /* Light blue color on hover */
+        /* Suggestion Cards */
+        .suggestion-card {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.6), rgba(51, 65, 85, 0.4));
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            transition: all 0.3s ease;
             cursor: pointer;
-            /* Show pointer cursor on hover */
         }
 
-        .sidebar {
-            background-color: #0F172A;
+        .suggestion-card:hover {
+            transform: translateY(-3px);
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(51, 65, 85, 0.6));
+            border-color: rgba(59, 130, 246, 0.4);
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.15);
         }
 
-        .glow-text {
-            text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+        /* Enhanced Sidebar */
+        .enhanced-sidebar {
+            background: linear-gradient(180deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.9));
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(59, 130, 246, 0.2);
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
         }
 
+        /* Message Actions */
+        .message-actions {
+            opacity: 0;
+            transition: all 0.3s ease;
+            transform: translateY(10px);
+        }
 
+        .message:hover .message-actions {
+            opacity: 1;
+            transform: translateY(0);
+        }
 
-        /* Styling for AI response markdown content */
+        .action-btn {
+            background: rgba(59, 130, 246, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            transition: all 0.2s ease;
+        }
+
+        .action-btn:hover {
+            background: rgba(59, 130, 246, 0.2);
+            transform: scale(1.1);
+        }
+
+        /* Markdown Content Enhancement */
         .markdown-content {
-            color: #E5E7EB;
-            /* Light text color for readability */
-            font-size: 1rem;
-            line-height: 1.6;
-            padding: 0.5rem;
-        }
-
-        .markdown-content h1,
-        .markdown-content h2,
-        .markdown-content h3 {
-            color: #93C5FD;
-            /* Lighter blue for headers */
-            font-weight: 600;
-            margin-top: 1rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .markdown-content h1 {
-            font-size: 1.5rem;
-        }
-
-        .markdown-content h2 {
-            font-size: 1.25rem;
-        }
-
-        .markdown-content h3 {
-            font-size: 1.1rem;
-        }
-
-        .markdown-content p {
-            margin-bottom: 1rem;
-            font-size: 1rem;
-        }
-
-        .markdown-content ul,
-        .markdown-content ol {
-            margin-left: 1.5rem;
-            margin-bottom: 1rem;
-            list-style-type: disc;
+            color: #e2e8f0;
+            line-height: 1.7;
         }
 
         .markdown-content code {
-            background-color: rgba(30, 41, 59, 0.8);
-            color: #F8FAFC;
-            padding: 2px 4px;
-            border-radius: 4px;
-            font-size: 0.9rem;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 0.9em;
         }
 
         .markdown-content pre {
-            background-color: #1E293B;
-            color: #F8FAFC;
-            padding: 1rem;
-            border-radius: 8px;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
             overflow-x: auto;
-            font-size: 0.9rem;
-            margin-bottom: 1rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
         }
 
-        .fade-in {
-            opacity: 0;
-            animation: fadeIn 1s forwards;
+        /* Avatar Enhancement */
+        .ai-avatar {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            border: 2px solid rgba(147, 197, 253, 0.3);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
         }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
+        /* Responsive Enhancements */
+        @media (max-width: 768px) {
+            .chat-container {
+                padding: 1rem;
             }
-
-            to {
-                opacity: 1;
+            
+            .suggestion-grid {
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
             }
         }
 
-
-        .highlight {
-            animation: highlight 1.5s ease-out;
+        /* Loading State */
+        .loading-skeleton {
+            background: linear-gradient(90deg, rgba(51, 65, 85, 0.3) 25%, rgba(71, 85, 105, 0.5) 50%, rgba(51, 65, 85, 0.3) 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
         }
 
-        @keyframes highlight {
-            from {
-                background-color: rgba(59, 130, 246, 0.6);
-                /* Light blue highlight */
-            }
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
 
-            to {
-                background-color: rgba(30, 41, 59, 0.5);
-                /* Default background */
-            }
+        /* Enhanced Focus States */
+        .focus-ring:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
         }
     </style>
 </head>
 
-<body class="bg-custom-dark text-gray-100" x-data="{ sidebarOpen: false }">
-    <!-- Sidebar -->
-    <div class="sidebar fixed top-0 left-0 h-full w-64 transform transition-transform duration-300 ease-in-out z-50"
+<body class="text-gray-100" x-data="{ sidebarOpen: false }">
+    <!-- Enhanced Sidebar -->
+    <div class="enhanced-sidebar fixed top-0 left-0 h-full w-72 transform transition-transform duration-300 ease-in-out z-50"
         :class="{ 'translate-x-0': sidebarOpen, '-translate-x-full': !sidebarOpen }">
         <div class="p-6">
-            <img src="static/BioMed-KAI-logo.png" alt="BioMed-KAI Logo" class="h-30 mb-8 filter invert">
+            <div class="flex items-center mb-8">
+                <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center mr-3">
+                    <i class="fas fa-brain text-white text-xl"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold text-white">BioMed-KAI</h2>
+                    <p class="text-xs text-gray-400">Precision Medicine AI</p>
+                </div>
+            </div>
             <nav>
-                <ul class="space-y-4">
-                    <li><a href="home"
-                            class="text-gray-300 px-5 block py-2 hover:bg-blue-600 rounded transition duration-300">Home</a>
-                    </li>
-                    <li><a href="midas"
-                            class="text-white font-semibold px-5 block py-2 bg-blue-600 rounded transition duration-300">BioMed-KAI</a>
-                    </li>
-                    <li><a href="source"
-                            class="text-gray-300 px-5 block py-2 hover:bg-blue-600 rounded transition duration-300">Knowledge
-                            Graph</a></li>
-                    <!-- <li><a href="about"
-                            class="text-gray-300 px-5 block py-2 hover:bg-blue-600 rounded transition duration-300">About</a>
-                    </li> -->
+                <ul class="space-y-3">
+                    <li><a href="home" class="flex items-center text-gray-300 px-4 py-3 rounded-xl hover:bg-blue-600 hover:bg-opacity-20 transition duration-300">
+                        <i class="fas fa-home mr-3"></i>Home
+                    </a></li>
+                    <li><a href="midas" class="flex items-center text-white font-semibold px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl transition duration-300">
+                        <i class="fas fa-comments mr-3"></i>Chat Interface
+                    </a></li>
+                    <li><a href="source" class="flex items-center text-gray-300 px-4 py-3 rounded-xl hover:bg-blue-600 hover:bg-opacity-20 transition duration-300">
+                        <i class="fas fa-project-diagram mr-3"></i>Knowledge Graph
+                    </a></li>
                 </ul>
             </nav>
         </div>
@@ -338,93 +361,82 @@
 
     <div class="overlay fixed inset-0 bg-black opacity-50 z-40" x-show="sidebarOpen" @click="sidebarOpen = false"></div>
 
-    <main class="flex-grow">
-        <section class="wave-header text-white py-16">
-            <div class="wave-container wave-container-1">
-                <div class="wave"></div>
-                <div class="wave"></div>
+    <main class="flex-grow flex flex-col">
+        <!-- Enhanced Header -->
+        <header class="modern-header px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center">
+                <button class="text-gray-300 hover:text-white transition-colors mr-4 p-2 rounded-lg hover:bg-white hover:bg-opacity-10" 
+                        @click="sidebarOpen = !sidebarOpen">
+                    <i class="fas fa-bars text-lg"></i>
+                </button>
+                <div class="flex items-center">
+                    <div class="ai-avatar w-10 h-10 rounded-full flex items-center justify-center mr-3">
+                        <i class="fas fa-robot text-white"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold text-white">BioMed-KAI Assistant</h1>
+                        <p class="text-sm text-gray-400">Ready to help with precision medicine</p>
+                    </div>
+                </div>
             </div>
-            <div class="wave-container wave-container-2">
-                <div class="wave"></div>
-                <div class="wave"></div>
-            </div>
-            <div class="wave-container wave-container-3">
-                <div class="wave"></div>
-                <div class="wave"></div>
-            </div>
+            <button id="new-chat" class="new-chat-btn text-white px-4 py-2 rounded-xl font-medium transition duration-300 flex items-center">
+                <i class="fas fa-plus mr-2"></i>New Chat
+            </button>
+        </header>
 
-            <div class="sidebar-toggle absolute top-4 left-4 z-50" @click="sidebarOpen = !sidebarOpen">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="3" y1="12" x2="21" y2="12"></line>
-                    <line x1="3" y1="6" x2="21" y2="6"></line>
-                    <line x1="3" y1="18" x2="21" y2="18"></line>
-                </svg>
-            </div>
-            <div class="container mx-auto px-6 text-center relative z-10">
-                <h1 class="text-5xl md:text-6xl font-bold mb-4 glow-text">BioMed-KAI Chat</h1>
-                <p class="text-2xl mb-8 text-blue-400 glow-text">Your AI-Powered Precision Medicine Assistant</p>
-            </div>
-        </section>
+        <!-- Chat Messages -->
+        <div id="chat-messages" class="chat-container flex-grow">
+            <!-- Messages will be inserted here -->
+        </div>
 
-        <button id="new-chat"
-            class="new-chat-button bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full shadow-lg transition duration-300"
-            style="position:sticky; left:100%; width: 8rem; margin: 1rem;">
-            <i class="fas fa-plus mr-2"></i>New Chat
-        </button>
-
-        <section class="flex-grow bg-gray-900">
-            <div id="chat-messages" class="p-6 space-y-4 relative z-10">
-                <!-- Chat messages will be inserted here -->
-            </div>
-        </section>
-
-        <section class="bg-gray-800 shadow-lg py-6">
-            <div class="container mx-auto px-6">
-                <div id="recommendation-section" class="grid grid-cols-2 gap-4 mb-4">
-                    <div class="sample-input text-gray-300 rounded-lg p-3 cursor-pointer text-sm">
+        <!-- Enhanced Input Section -->
+        <section class="input-section p-6">
+            <div class="max-w-4xl mx-auto">
+                <!-- Suggestion Cards -->
+                <div id="suggestion-section" class="suggestion-grid grid grid-cols-2 gap-4 mb-6">
+                    <div class="suggestion-card rounded-xl p-4 text-sm text-gray-300">
+                        <i class="fas fa-microscope text-blue-400 mr-2"></i>
                         What are the latest advancements in cancer immunotherapy?
                     </div>
-                    <div class="sample-input text-gray-300 rounded-lg p-3 cursor-pointer text-sm">
+                    <div class="suggestion-card rounded-xl p-4 text-sm text-gray-300">
+                        <i class="fas fa-dna text-blue-400 mr-2"></i>
                         How does pharmacogenomics influence drug efficacy?
                     </div>
-                    <div class="sample-input text-gray-300 rounded-lg p-3 cursor-pointer text-sm">
+                    <div class="suggestion-card rounded-xl p-4 text-sm text-gray-300">
+                        <i class="fas fa-chart-line text-blue-400 mr-2"></i>
                         Can you explain the role of biomarkers in precision medicine?
                     </div>
-                    <div class="sample-input text-gray-300 rounded-lg p-3 cursor-pointer text-sm">
+                    <div class="suggestion-card rounded-xl p-4 text-sm text-gray-300">
+                        <i class="fas fa-balance-scale text-blue-400 mr-2"></i>
                         What are the ethical considerations in genetic testing?
                     </div>
                 </div>
-                <form id="chat-form" class="flex items-center">
-                    <input type="text" id="user-input"
-                        class="flex-grow px-4 py-3 bg-gray-700 text-white border-gray-600 rounded-l-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Ask BioMed-KAI about precision medicine...">
-                    <button type="submit"
-                        class="bg-blue-600 text-white px-8 py-3 rounded-r-full hover:bg-blue-700 transition duration-300 flex items-center">
-                        <span class="mr-2">Send</span>
-                        <i class="fas fa-paper-plane"></i>
+
+                <!-- Input Form -->
+                <form id="chat-form" class="flex items-end gap-4">
+                    <div class="flex-grow relative">
+                        <textarea id="user-input" rows="1"
+                            class="chat-input w-full px-6 py-4 text-white rounded-2xl resize-none focus-ring placeholder-gray-400"
+                            placeholder="Ask BioMed-KAI about precision medicine..."
+                            style="min-height: 56px; max-height: 120px;"></textarea>
+                        <div class="absolute right-4 bottom-4 text-xs text-gray-500">
+                            <span id="char-count">0</span>/2000
+                        </div>
+                    </div>
+                    <button type="submit" class="send-button text-white px-6 py-4 rounded-2xl font-medium transition duration-300 flex items-center h-14">
+                        <i class="fas fa-paper-plane text-lg"></i>
                     </button>
                 </form>
             </div>
         </section>
     </main>
 
-    <footer class="bg-gray-800 text-gray-400 py-6">
-        <div class="container mx-auto px-6 text-center">
-            <p>&copy; 2024 BioMed-KAI. Empowering Precision Medicine with Advanced AI and Dynamic Knowledge Graphs. All
-                rights reserved.</p>
-        </div>
-    </footer>
-
-    <!-- <footer class="bg-white shadow-md py-4 sticky bottom-0 z-50">
-        
-    </footer> -->
-
     <script>
         const chatMessages = document.getElementById('chat-messages');
         const chatForm = document.getElementById('chat-form');
         const userInput = document.getElementById('user-input');
         const newChatButton = document.getElementById('new-chat');
+        const charCount = document.getElementById('char-count');
 
         let messageIdCounter = 0;
         let editingMessageId = null;
@@ -433,7 +445,10 @@
             "id": "biomedkai-chat-" + Math.random().toString(16).slice(2),
             "chat_history": chatHistory
         };
+        let thinkingInterval;
+        let currentPonderingElement = null;
 
+        // Enhanced marked configuration
         marked.use({
             breaks: true,
             gfm: true,
@@ -443,12 +458,31 @@
             },
         });
 
-        // Add an initial welcome message
-        addMessage('ai', 'Welcome to BioMed-KAI! How can I assist you with bio-medicine today?');
+        // Auto-resize textarea
+        userInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+            
+            // Update character count
+            const count = this.value.length;
+            charCount.textContent = count;
+            charCount.className = count > 1800 ? 'text-red-400' : count > 1500 ? 'text-yellow-400' : 'text-gray-500';
+        });
+
+        // Add initial welcome message
+        addMessage('ai', 'Hello! I\'m BioMed-KAI, your AI assistant for precision medicine. How can I help you today?');
 
         chatForm.addEventListener('submit', function (e) {
             e.preventDefault();
             sendMessage();
+        });
+
+        // Enhanced keyboard shortcuts
+        userInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
         });
 
         newChatButton.addEventListener('click', function () {
@@ -457,98 +491,27 @@
                 "id": "biomedkai-chat-" + Math.random().toString(16).slice(2),
                 "chat_history": []
             };
-            addMessage('ai', 'Welcome to a new chat! How can I assist you with bio-medicine today?');
+            chatHistory = [];
+            addMessage('ai', 'Hello! I\'m BioMed-KAI, your AI assistant for precision medicine. How can I help you today?');
         });
 
         function sendMessage() {
             const message = userInput.value.trim();
-            if (message) {
-                if (editingMessageId !== null) {
-                    updateMessage(editingMessageId, 'user', message);
-                    editingMessageId = null;
-                } else {
-                    addMessage('user', message);
-                }
-                userInput.value = '';
-                streamResponse(message);
+            if (!message) return;
+
+            if (editingMessageId !== null) {
+                updateMessage(editingMessageId, 'user', message);
+                editingMessageId = null;
+            } else {
+                addMessage('user', message);
             }
-        }
-
-        // async function streamResponse(message) {
-        //     const thinkingIndicator = addThinkingIndicator();
-
-        //     try {
-        //         responseTimeout = setTimeout(() => {
-        //             throw new Error('Response timeout');
-        //         }, 20000);
-        //         const response = await fetch('api/stream', {
-        //             method: 'POST',
-        //             headers: {
-        //                 'Content-Type': 'application/json',
-        //             },
-        //             body: JSON.stringify({ text: message, chatHistory: chatHistory }),
-        //         });
-
-        //         clearTimeout(responseTimeout);
-        //         const reader = response.body.getReader();
-        //         const decoder = new TextDecoder();
-
-        //         let aiMessageElement = addMessage('ai', '');
-        //         let fullResponse = '';
-
-        //         while (true) {
-        //             const { done, value } = await reader.read();
-
-        //             if (done) {
-        //                 console.log("Stream complete");
-        //                 break;
-        //             }
-
-        //             const chunk = decoder.decode(value);
-        //             const lines = chunk.split('\n');
-        //             let eor = false;
-        //             removeThinkingIndicator(thinkingIndicator);
-        //             for (const line of lines) {
-        //                 if (line.startsWith('data:')) {
-        //                     const jsonStr = line.slice(5).trim();
-        //                     try {
-        //                         if (jsonStr === '<EOR>') {
-        //                             eor = true;
-        //                             break;
-        //                         }
-        //                         const data = JSON.parse(jsonStr);
-        //                         fullResponse += data.chunk || '';
-        //                         aiMessageElement.querySelector('.message-content').innerHTML = marked.parse(fullResponse);
-        //                         hljs.highlightAll();
-        //                         chatMessages.scrollTop = chatMessages.scrollHeight;
-        //                         // const data = JSON.parse(jsonStr);
-        //                         // fullResponse += data.chunk || '';
-        //                         // aiMessageElement.querySelector('.message-content').innerHTML = marked.parse(fullResponse);
-        //                         // // aiMessageElement.innerHTML = marked.parse(fullResponse);
-        //                         // hljs.highlightAll();
-        //                         // chatMessages.scrollTop = chatMessages.scrollHeight;
-        //                     } catch (e) {
-        //                         console.error('Error parsing JSON:', e);
-        //                     }
-        //                 }
-        //             }
-        //             if (eor) {
-        //                 break;
-        //             }
-        //         }
-        //         chatHistory.push({ role: 'user', content: message });
-        //         chatHistory.push({ role: 'assistant', content: fullResponse });
-        //     } catch (error) {
-        //         console.error('Streaming failed:', error);
-        //         removeThinkingIndicator(thinkingIndicator);
-        //         showErrorMessage('Sorry, an error occurred while processing your request. Please try again.');
-        //     } finally {
-        //         removeThinkingIndicator(thinkingIndicator);
-        //     }
-        // }
-
-        function scrollToBottom() {
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            userInput.value = '';
+            userInput.style.height = 'auto';
+            charCount.textContent = '0';
+            charCount.className = 'text-gray-500';
+            
+            streamResponse(message);
         }
 
         async function streamResponse(message) {
@@ -561,27 +524,23 @@
                     timeoutId = setTimeout(() => {
                         timeoutOccurred = true;
                         reject(new Error('Response timeout'));
-                    }, 20000);
+                    }, 30000); // Increased timeout
                 });
-                convo = chatDetails.chat_history.forEach((msg) => {
-                    return msg.role + "-$$-" + msg.content;
-                });
+
+                const conversations = chatDetails.chat_history.map(msg => msg.role + "-$$-" + msg.content);
+                
                 const fetchPromise = fetch('api/stream', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ text: message, conversations: convo, id: chatDetails.id }),
+                    body: JSON.stringify({ text: message, conversations: conversations, id: chatDetails.id }),
                 });
 
                 const response = await Promise.race([fetchPromise, timeoutPromise]);
-
-                if (timeoutOccurred) {
-                    throw new Error('Response timeout');
-                }
+                if (timeoutOccurred) throw new Error('Response timeout');
 
                 clearTimeout(timeoutId);
-
                 const reader = response.body.getReader();
                 const decoder = new TextDecoder();
 
@@ -591,15 +550,12 @@
 
                 while (true) {
                     const { done, value } = await reader.read();
-
-                    if (done) {
-                        console.log("Stream complete");
-                        break;
-                    }
+                    if (done) break;
 
                     const chunk = decoder.decode(value);
                     const lines = chunk.split('\n');
                     let eor = false;
+                    
                     removeThinkingIndicator(thinkingIndicator);
 
                     for (const line of lines) {
@@ -610,114 +566,170 @@
                                     eor = true;
                                     break;
                                 }
+                                
                                 const data = JSON.parse(jsonStr);
 
+                                // Handle pondering actions
+                                if (data.chunk && data.chunk.startsWith('<||action||>')) {
+                                    const actionText = data.chunk.replace('<||action||>', '').trim();
+                                    if (actionText) {
+                                        showPonderingAction(actionText, aiMessageElement);
+                                        if (actionText.includes('Agent')) {
+                                            // Extract Agent Name: Sample text "👨‍⚕️ **Sample Agent** responding:\n\n"
+                                            const agentNameMatch = actionText.match(/👨‍⚕️ \*\*(.*?)\*\*/);
+                                            const agentName = agentNameMatch ? agentNameMatch[1] : 'BioMed-KAI';
+
+                                            addAgentTagToMessageBox(aiMessageElement, agentName.replace("Agent", "").trim());
+                                        }
+                                    }
+                                    continue;
+                                }
+
+                                // Handle duplicate chunks
                                 if (data.chunk && data.chunk.length > 0 && fullResponse.endsWith(data.chunk) && fullResponse.length > data.chunk.length) {
-                                    // this means repeated chunks are being sent
-                                    // so we need to remove the last chunk from the full response
                                     fullResponse = fullResponse.slice(0, -data.chunk.length);
                                 }
+
                                 if (data.recommendation) {
                                     recommendations = data.recommendation;
                                 }
-                                if (data.chunk) {
-                                    fullResponse += data.chunk || '';
-                                    aiMessageElement.querySelector('.message-content').innerHTML = marked.parse(fullResponse);
-                                    hljs.highlightAll();
 
+                                if (data.chunk) {
+                                    // Remove any pondering action before adding to response
+                                    hidePonderingAction();
+                                    
+                                    fullResponse += data.chunk || '';
+                                    const contentDiv = aiMessageElement.querySelector('.message-content');
+                                    contentDiv.innerHTML = marked.parse(fullResponse);
+                                    hljs.highlightAll();
                                 }
-                                chatMessages.scrollTop = chatMessages.scrollHeight;
+                                
+                                scrollToBottom();
                             } catch (e) {
                                 console.error('Error parsing JSON:', e);
                             }
                         }
                     }
-                    if (eor) {
-                        break;
-                    }
+                    if (eor) break;
                 }
+
+                // Clean up pondering action
+                hidePonderingAction();
+
                 chatHistory.push({ role: 'user', content: message });
                 chatHistory.push({ role: 'assistant', content: fullResponse });
                 chatDetails.chat_history = chatHistory;
 
-                // Update recommendations dynamically
                 if (recommendations) {
-                    updateRecommendations(recommendations);
+                    updateSuggestions(recommendations);
                 }
             } catch (error) {
                 console.error('Streaming failed:', error);
-                if (timeoutOccurred) {
-                    showErrorMessage('Sorry, the response timed out. Please try again.');
-                } else {
-                    showErrorMessage('Sorry, an error occurred while processing your request. Please try again.');
-                }
+                showErrorMessage(timeoutOccurred ? 
+                    'Sorry, the response timed out. Please try again.' : 
+                    'Sorry, an error occurred while processing your request. Please try again.'
+                );
             } finally {
                 clearTimeout(timeoutId);
                 removeThinkingIndicator(thinkingIndicator);
+                hidePonderingAction();
             }
         }
 
-        function updateRecommendations(recommendations) {
-            const recommendationSection = document.getElementById('recommendation-section');
-            recommendationSection.innerHTML = ''; // Clear existing recommendations
+        function showPonderingAction(actionText, messageElement) {
+            hidePonderingAction(); // Remove any existing pondering action
+            
+            const ponderingDiv = document.createElement('div');
+            ponderingDiv.className = 'pondering-action rounded-lg px-3 py-2 mb-2 text-sm text-blue-200 flex items-center';
+            ponderingDiv.innerHTML = `
+                <div class="typing-dots mr-3">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+                <div class="flex-grow">
+                    <div class="pondering-text">${actionText}</div>
+                </div>
+            `;
+            
+            const messageContainer = messageElement.lastChild;
+            messageContainer.insertBefore(ponderingDiv, messageContainer.firstChild);
+            currentPonderingElement = ponderingDiv;
+            
+            scrollToBottom();
+        }
 
-            recommendations = recommendations.substring(2, recommendations.length - 2).split("', '")
-            if (recommendations.length === 1) {
-                recommendations = recommendations[0].split("\", \"")
+        function hidePonderingAction() {
+            if (currentPonderingElement) {
+                currentPonderingElement.remove();
+                currentPonderingElement = null;
+            }
+        }
+
+        function addAgentTagToMessageBox(messageElement, agentName = 'BioMed-KAI') {
+            const agentTag = document.createElement('span');
+            agentTag.className = 'text-xs text-blue-400 bg-blue-900 rounded-full px-2 py-1 ml-2';
+            agentTag.textContent = agentName;
+            messageElement.appendChild(agentTag);
+        }
+
+        function updateSuggestions(recommendations) {
+            const suggestionSection = document.getElementById('suggestion-section');
+            suggestionSection.innerHTML = '';
+
+            // Parse recommendations
+            let parsedRecommendations = recommendations;
+            if (typeof recommendations === 'string') {
+                try {
+                    parsedRecommendations = recommendations.substring(2, recommendations.length - 2).split("', '");
+                    if (parsedRecommendations.length === 1) {
+                        parsedRecommendations = parsedRecommendations[0].split("\", \"");
+                    }
+                } catch (e) {
+                    console.error('Error parsing recommendations:', e);
+                    return;
+                }
             }
 
-            // <div id="recommendation-section" class="grid grid-cols-2 gap-4 mb-4">
-            //         <div class="sample-input text-gray-300 rounded-lg p-3 cursor-pointer text-sm">
-            //             What are the latest advancements in cancer immunotherapy?
-            //         </div>
-            //         <div class="sample-input text-gray-300 rounded-lg p-3 cursor-pointer text-sm">
-            //             How does pharmacogenomics influence drug efficacy?
-            //         </div>
-            //         <div class="sample-input text-gray-300 rounded-lg p-3 cursor-pointer text-sm">
-            //             Can you explain the role of biomarkers in precision medicine?
-            //         </div>
-            //         <div class="sample-input text-gray-300 rounded-lg p-3 cursor-pointer text-sm">
-            //             What are the ethical considerations in genetic testing?
-            //         </div>
-            //     </div>
-            // Iterate over the recommendations and create new elements
-            recommendations.forEach((recommendation) => {
-                const recommendationDiv = document.createElement('div');
-                recommendationDiv.className = 'sample-input text-gray-300 rounded-lg p-3 cursor-pointer text-sm highlight'; // Combine classes
-                recommendationDiv.textContent = recommendation;
-
-                // Add click event to populate the user input with the recommendation
-                recommendationDiv.addEventListener('click', function () {
+            const icons = ['fas fa-microscope', 'fas fa-dna', 'fas fa-chart-line', 'fas fa-balance-scale'];
+            
+            parsedRecommendations.forEach((recommendation, index) => {
+                const suggestionDiv = document.createElement('div');
+                suggestionDiv.className = 'suggestion-card rounded-xl p-4 text-sm text-gray-300';
+                suggestionDiv.innerHTML = `
+                    <i class="${icons[index % icons.length]} text-blue-400 mr-2"></i>
+                    ${recommendation}
+                `;
+                
+                suggestionDiv.addEventListener('click', function () {
                     userInput.value = recommendation;
+                    userInput.focus();
                     sendMessage();
                 });
-
-                recommendationSection.appendChild(recommendationDiv);
+                
+                suggestionSection.appendChild(suggestionDiv);
             });
         }
 
-
         function addMessage(sender, text, id = null) {
-
             const messageId = id !== null ? id : messageIdCounter++;
             const messageDiv = document.createElement('div');
-            messageDiv.className = `flex ${sender === 'user' ? 'justify-end' : 'justify-start'} message-appear message relative`;
+            messageDiv.className = `message flex ${sender === 'user' ? 'justify-end' : 'justify-start'} mb-6 message-enter`;
             messageDiv.dataset.id = messageId;
 
-            const innerDiv = document.createElement('div');
-            innerDiv.className = `${sender === 'user' ? 'bg-blue-600 text-white' : 'text-gray-800'} rounded-lg p-3 shadow-md markdown-content`;
+            const messageContainer = document.createElement('div');
+            messageContainer.className = `max-w-4xl ${sender === 'user' ? 'ml-12' : 'mr-12'} relative group`;
 
+            const bubble = document.createElement('div');
             const contentDiv = document.createElement('div');
-            contentDiv.className = 'message-content';
-            contentDiv.innerHTML = sender === 'user' ? text : marked.parse(text);
-            contentDiv.style = sender === 'user' ? '' : "background: rgba(17, 24, 39, var(--tw-bg-opacity));display: inline-block;padding: 0.5rem;border-radius: 0.5rem;width: calc(100% - 50px);";
-
-            // Use custom images for user and AI icons
-
+            contentDiv.className = 'message-content markdown-content';
 
             if (sender === 'user') {
+                bubble.className = 'user-bubble text-white rounded-2xl px-6 py-4 shadow-lg';
+                contentDiv.innerHTML = text;
                 contentDiv.contentEditable = true;
-                contentDiv.className += ' editable-message';
+                contentDiv.className += ' editable-message focus-ring';
+                
                 contentDiv.addEventListener('keydown', function (e) {
                     if (e.key === 'Enter' && !e.shiftKey) {
                         e.preventDefault();
@@ -726,12 +738,16 @@
                     }
                 });
 
+                // Enhanced message actions
+                const actionsDiv = document.createElement('div');
+                actionsDiv.className = 'message-actions flex items-center gap-2 mt-2';
+                
                 const editButton = document.createElement('button');
                 editButton.innerHTML = '<i class="fas fa-edit"></i>';
-                editButton.className = 'edit-button';
+                editButton.className = 'action-btn text-gray-400 hover:text-white p-2 rounded-lg text-xs';
+                editButton.title = 'Edit message';
                 editButton.addEventListener('click', () => {
                     contentDiv.focus();
-                    // Place cursor at the end of the content
                     const range = document.createRange();
                     range.selectNodeContents(contentDiv);
                     range.collapse(false);
@@ -742,34 +758,82 @@
 
                 const resendButton = document.createElement('button');
                 resendButton.innerHTML = '<i class="fas fa-redo"></i>';
-                resendButton.className = 'resend-button';
+                resendButton.className = 'action-btn text-gray-400 hover:text-white p-2 rounded-lg text-xs';
+                resendButton.title = 'Resend message';
                 resendButton.addEventListener('click', () => resendMessage(messageId));
 
-                innerDiv.appendChild(editButton);
-                innerDiv.appendChild(resendButton);
-            } else {
-                const icon = document.createElement('img');
-                icon.src = 'static/ai-animated.gif'; // Replace with actual paths
-                icon.alt = 'AI Icon';
-                icon.className = 'w-8 h-8 rounded-full'; // Adjust width and height as needed
-                icon.style = 'display: inline;margin-right: 10px; margin: 1.5rem 10px 0 0; float: inline-start;';
+                const copyButton = document.createElement('button');
+                copyButton.innerHTML = '<i class="fas fa-copy"></i>';
+                copyButton.className = 'action-btn text-gray-400 hover:text-white p-2 rounded-lg text-xs';
+                copyButton.title = 'Copy message';
+                copyButton.addEventListener('click', () => copyToClipboard(text));
 
-                // aiMessageElement.querySelector('.message-content').appendChild(icon);
-                innerDiv.appendChild(icon);
+                actionsDiv.appendChild(editButton);
+                actionsDiv.appendChild(resendButton);
+                actionsDiv.appendChild(copyButton);
+                messageContainer.appendChild(actionsDiv);
+            } else {
+                bubble.className = 'ai-bubble text-gray-100 rounded-2xl px-6 py-4 shadow-lg flex items-start';
+                
+                // AI Avatar
+                const avatarDiv = document.createElement('div');
+                avatarDiv.className = 'ai-avatar w-8 h-8 rounded-full flex items-center justify-center mr-4 flex-shrink-0 mt-1';
+                avatarDiv.innerHTML = '<i class="fas fa-robot text-white text-sm"></i>';
+                
+                const textContainer = document.createElement('div');
+                textContainer.className = 'flex-grow';
+                textContainer.appendChild(contentDiv);
+                
+                bubble.appendChild(avatarDiv);
+                bubble.appendChild(textContainer);
+                
+                contentDiv.innerHTML = text ? marked.parse(text) : '';
+
+                // AI message actions
+                const actionsDiv = document.createElement('div');
+                actionsDiv.className = 'message-actions flex items-center gap-2 mt-3 ml-12';
+                
+                const copyButton = document.createElement('button');
+                copyButton.innerHTML = '<i class="fas fa-copy"></i>';
+                copyButton.className = 'action-btn text-gray-400 hover:text-white p-2 rounded-lg text-xs';
+                copyButton.title = 'Copy response';
+                copyButton.addEventListener('click', () => copyToClipboard(contentDiv.innerText));
+
+                const thumbsUpButton = document.createElement('button');
+                thumbsUpButton.innerHTML = '<i class="far fa-thumbs-up"></i>';
+                thumbsUpButton.className = 'action-btn text-gray-400 hover:text-green-400 p-2 rounded-lg text-xs';
+                thumbsUpButton.title = 'Good response';
+                thumbsUpButton.addEventListener('click', () => {
+                    thumbsUpButton.innerHTML = '<i class="fas fa-thumbs-up"></i>';
+                    thumbsUpButton.className = thumbsUpButton.className.replace('text-gray-400', 'text-green-400');
+                });
+
+                const thumbsDownButton = document.createElement('button');
+                thumbsDownButton.innerHTML = '<i class="far fa-thumbs-down"></i>';
+                thumbsDownButton.className = 'action-btn text-gray-400 hover:text-red-400 p-2 rounded-lg text-xs';
+                thumbsDownButton.title = 'Poor response';
+                thumbsDownButton.addEventListener('click', () => {
+                    thumbsDownButton.innerHTML = '<i class="fas fa-thumbs-down"></i>';
+                    thumbsDownButton.className = thumbsDownButton.className.replace('text-gray-400', 'text-red-400');
+                });
+
+                actionsDiv.appendChild(copyButton);
+                actionsDiv.appendChild(thumbsUpButton);
+                actionsDiv.appendChild(thumbsDownButton);
+                messageContainer.appendChild(actionsDiv);
             }
 
-
-            innerDiv.appendChild(contentDiv);
-            messageDiv.appendChild(innerDiv);
+            bubble.appendChild(contentDiv);
+            messageContainer.appendChild(bubble);
+            messageDiv.appendChild(messageContainer);
             chatMessages.appendChild(messageDiv);
 
-            if (sender === 'ai') {
+            if (sender === 'ai' && text) {
                 hljs.highlightAll();
             }
 
-            chatMessages.scrollTop = chatMessages.scrollHeight;
             scrollToBottom();
-            return innerDiv;
+            return bubble;
         }
 
         function handleEdit(id, newText) {
@@ -781,14 +845,15 @@
             const messageDiv = document.querySelector(`.message[data-id="${id}"]`);
             const contentDiv = messageDiv.querySelector('.message-content');
             contentDiv.innerHTML = sender === 'user' ? text : marked.parse(text);
+            
             if (sender === 'ai') {
                 hljs.highlightAll();
             }
+            
             // Update chat history
-            const messageIndex = chatHistory.findIndex(msg => msg.role === 'user' && msg.content === contentDiv.textContent.trim());
+            const messageIndex = chatHistory.findIndex(msg => msg.role === 'user' && msg.content === text);
             if (messageIndex !== -1) {
                 chatHistory[messageIndex].content = text;
-                // Remove all messages after this one
                 chatHistory.splice(messageIndex + 1);
             }
         }
@@ -806,7 +871,7 @@
             }
 
             // Update chat history
-            const messageIndex = chatHistory.findIndex(msg => msg.role === 'user' && msg.content === contentDiv.textContent.trim());
+            const messageIndex = chatHistory.findIndex(msg => msg.role === 'user' && msg.content === message);
             if (messageIndex !== -1) {
                 chatHistory.splice(messageIndex + 1);
             }
@@ -816,88 +881,162 @@
 
         function addThinkingIndicator() {
             const indicatorDiv = document.createElement('div');
-            indicatorDiv.className = 'flex justify-start message-appear';
+            indicatorDiv.className = 'message flex justify-start mb-6 message-enter';
 
-            // Messages to display in sequence
-            const messages = ["BioMed-KAI is thinking", "Verifying accuracy", "Performing final analysis"];
+            const messages = [
+                "Analyzing your question...",
+                "Searching medical knowledge...",
+                "Preparing response...",
+                "Validating information..."
+            ];
             let messageIndex = 0;
 
-            // Create the HTML structure for the indicator
+            const container = document.createElement('div');
+            container.className = 'max-w-4xl mr-12';
+
+            const thinkingContainer = document.createElement('div');
+            thinkingContainer.className = 'thinking-enhanced rounded-2xl px-6 py-4 shadow-lg flex items-center';
+
+            const avatarDiv = document.createElement('div');
+            avatarDiv.className = 'ai-avatar w-8 h-8 rounded-full flex items-center justify-center mr-4 flex-shrink-0';
+            avatarDiv.innerHTML = '<i class="fas fa-robot text-white text-sm"></i>';
+
             const messageText = document.createElement('span');
-            messageText.className = 'mr-2';
+            messageText.className = 'mr-4 text-gray-300 text-sm';
             messageText.textContent = messages[messageIndex];
 
             const dotsContainer = document.createElement('div');
-            dotsContainer.className = 'flex space-x-1';
-            dotsContainer.style = "margin-top: 0.5rem;";
+            dotsContainer.className = 'typing-dots';
             for (let i = 0; i < 3; i++) {
                 const dot = document.createElement('div');
-                dot.className = 'w-2 h-2 bg-gray-600 rounded-full pulse';
-                dot.style.animationDelay = `${i * 0.2}s`;
+                dot.className = 'typing-dot';
                 dotsContainer.appendChild(dot);
             }
 
-            // Append text and dots to indicator div
-            indicatorDiv.appendChild(messageText);
-            indicatorDiv.appendChild(dotsContainer);
+            thinkingContainer.appendChild(avatarDiv);
+            thinkingContainer.appendChild(messageText);
+            thinkingContainer.appendChild(dotsContainer);
+            container.appendChild(thinkingContainer);
+            indicatorDiv.appendChild(container);
+            
             chatMessages.appendChild(indicatorDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+            scrollToBottom();
 
-            // Update message every 2 seconds
+            // Cycle through messages
             thinkingInterval = setInterval(() => {
                 messageIndex = (messageIndex + 1) % messages.length;
                 messageText.textContent = messages[messageIndex];
-            }, 2000);
+            }, 2500);
 
             return indicatorDiv;
         }
 
         function removeThinkingIndicator(indicator) {
-            clearInterval(thinkingInterval); // Stop the interval
+            clearInterval(thinkingInterval);
             if (indicator && indicator.parentNode) {
                 indicator.parentNode.removeChild(indicator);
             }
         }
 
-        // function addThinkingIndicator() {
-        //     const indicatorDiv = document.createElement('div');
-        //     indicatorDiv.className = 'flex justify-start message-appear';
-        //     indicatorDiv.innerHTML = `
-        //         <div class="bg-gray-200 text-gray-600 rounded-lg p-3 shadow-md flex items-center">
-        //             <span class="mr-2">BioMed-KAI is thinking</span>
-        //             <div class="flex space-x-1">
-        //                 <div class="w-2 h-2 bg-gray-600 rounded-full pulse"></div>
-        //                 <div class="w-2 h-2 bg-gray-600 rounded-full pulse" style="animation-delay: 0.2s"></div>
-        //                 <div class="w-2 h-2 bg-gray-600 rounded-full pulse" style="animation-delay: 0.4s"></div>
-        //             </div>
-        //         </div>
-        //     `;
-        //     chatMessages.appendChild(indicatorDiv);
-        //     chatMessages.scrollTop = chatMessages.scrollHeight;
-        //     return indicatorDiv;
-        // }
-
-        // function removeThinkingIndicator(indicator) {
-        //     console.log('Removing thinking indicator');
-        //     if (indicator && indicator.parentNode) {
-        //         indicator.parentNode.removeChild(indicator);
-        //     }
-        // }
-
         function showErrorMessage(message) {
             const errorDiv = document.createElement('div');
-            errorDiv.className = 'error-message';
-            errorDiv.textContent = message;
+            errorDiv.className = 'message flex justify-start mb-6 message-enter';
+            
+            const container = document.createElement('div');
+            container.className = 'max-w-4xl mr-12';
+            
+            const errorContainer = document.createElement('div');
+            errorContainer.className = 'bg-red-900 bg-opacity-50 border border-red-500 text-red-200 rounded-2xl px-6 py-4 shadow-lg flex items-center';
+            errorContainer.innerHTML = `
+                <i class="fas fa-exclamation-triangle text-red-400 mr-3"></i>
+                <span>${message}</span>
+            `;
+            
+            container.appendChild(errorContainer);
+            errorDiv.appendChild(container);
             chatMessages.appendChild(errorDiv);
+            scrollToBottom();
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                // Show temporary success indicator
+                const toast = document.createElement('div');
+                toast.className = 'fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all duration-300';
+                toast.innerHTML = '<i class="fas fa-check mr-2"></i>Copied to clipboard';
+                document.body.appendChild(toast);
+                
+                setTimeout(() => {
+                    toast.style.opacity = '0';
+                    toast.style.transform = 'translateY(-20px)';
+                    setTimeout(() => document.body.removeChild(toast), 300);
+                }, 2000);
+            });
+        }
+
+        function scrollToBottom() {
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
-        // Add event listeners for sample inputs
-        document.querySelectorAll('.sample-input').forEach(input => {
-            input.addEventListener('click', function () {
-                userInput.value = this.textContent.trim();
-                sendMessage();
+        // Enhanced suggestion card interactions
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.suggestion-card')) {
+                const card = e.target.closest('.suggestion-card');
+                const text = card.textContent.trim();
+                // Remove icon text from the beginning
+                const cleanText = text.replace(/^[^\w]*/, '').trim();
+                userInput.value = cleanText;
+                userInput.focus();
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl/Cmd + K to focus input
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                e.preventDefault();
+                userInput.focus();
+            }
+            
+            // Escape to clear input
+            if (e.key === 'Escape' && document.activeElement === userInput) {
+                userInput.value = '';
+                userInput.style.height = 'auto';
+                charCount.textContent = '0';
+                charCount.className = 'text-gray-500';
+            }
+        });
+
+        // Auto-scroll on new messages - Enhanced observer
+        const observer = new MutationObserver(function(mutations) {
+            let shouldScroll = false;
+            mutations.forEach(function(mutation) {
+                if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+                    shouldScroll = true;
+                }
+                if (mutation.type === 'characterData' || (mutation.type === 'childList' && mutation.target.classList.contains('message-content'))) {
+                    shouldScroll = true;
+                }
             });
+            if (shouldScroll) {
+                scrollToBottom();
+            }
+        });
+
+        observer.observe(chatMessages, { 
+            childList: true, 
+            subtree: true, 
+            characterData: true 
+        });
+
+        // Improved responsive handling
+        window.addEventListener('resize', function() {
+            scrollToBottom();
+        });
+
+        // Force scroll to bottom when page loads
+        window.addEventListener('load', function() {
+            setTimeout(scrollToBottom, 100);
         });
     </script>
 </body>
