@@ -17,7 +17,6 @@ from src.tools import create_tool_registry
 from src.monitoring.metrics_collector import setup_metrics
 from src.monitoring.health_checker import health_router
 import os
-os.environ["LANGCHAIN_API_KEY"] = "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"
 
 # Configure structured logging
 structlog.configure(
