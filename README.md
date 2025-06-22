@@ -275,8 +275,6 @@ BioMed-KAI contributes to the emerging field of **agentic AI in biomedicine**, e
 
 **🤖 Pioneering Agentic AI for Precision Medicine 🧬**
 
-*Built with ❤️ by the BioMed-KAI Research Team*
-
 **Empowering the next generation of autonomous biomedical discovery**
 
 </div>
