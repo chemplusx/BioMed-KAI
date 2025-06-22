@@ -16,9 +16,11 @@ LOG_DIR = BASE_DIR / "logs"
 MODEL_DIR = BASE_DIR / "models"
 
 os.environ["LANGCHAIN_TRACING_V2"] = "true"
-os.environ["LANGCHAIN_API_KEY"] = "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"
+if os.getenv("LANGCHAIN_API_KEY") is None:
+    os.environ["LANGCHAIN_API_KEY"] = "***"
 os.environ["LANGCHAIN_ENDPOINT"] = "https://api.smith.langchain.com"
-os.environ["LANGSMITH_API_KEY"] = "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"
+if os.getenv("LANGSMITH_API_KEY") is None:
+    os.environ["LANGSMITH_API_KEY"] = "***"
 os.environ["LANGSMITH_ENDPOINT"] = "https://api.smith.langchain.com"
 # Disable LangSmith if no API key
 if not os.getenv("LANGSMITH_API_KEY"):
