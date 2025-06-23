@@ -7,7 +7,7 @@
 [![Docker](https://img.shields.io/badge/Docker-Supported-blue?style=for-the-badge&logo=docker)](https://docker.com)
 [![Neo4j](https://img.shields.io/badge/Neo4j-Graph%20Database-green?style=for-the-badge&logo=neo4j)](https://neo4j.com)
 
-**An agentic RAG-powered precision medicine platform with context-aware AI agents and dynamic medical knowledge graphs**
+**An agentic CARE-RAG powered precision medicine platform with context-aware AI agents and dynamic medical knowledge graphs**
 
 [🌐 Live Demo](http://pitools.niper.ac.in/biomedkai/home) | [📖 Documentation](#documentation) | [🤝 Contributing](CONTRIBUTING.md)
 
@@ -21,7 +21,7 @@ Unlike traditional passive AI systems, BioMed-KAI features **proactive AI agents
 
 ### ✨ Key Features
 
-- **🤖 Agentic RAG Architecture**: Advanced AI agents with retrieval-augmented generation for autonomous biomedical reasoning
+- **🤖 Agentic Architecture**: Advanced AI agents with a new retrieval-augmented generation for autonomous biomedical reasoning
 - **🧠 LLM-Powered Inference**: State-of-the-art language models optimized for medical text understanding and generation
 - **🕸️ Dynamic Knowledge Graph**: Neo4j-based continuously updated medical knowledge base with semantic relationships
 - **🎯 Context-Aware Intelligence**: AI agents that understand clinical context and adapt reasoning accordingly
@@ -37,7 +37,7 @@ Unlike traditional passive AI systems, BioMed-KAI features **proactive AI agents
 │   Web App       │◄──►│   Agentic RAG System          │◄──►│  Graph (Neo4j)  │
 │   (Go Server)   │    │   • AI Agent Orchestration    │    │  Medical Data   │
 └─────────────────┘    │   • LLM Inference Engine      │    └─────────────────┘
-         │             │   • RAG Retrieval System      │              │
+         │             │   • CARE-RAG Retrieval System      │              │
          │             │   • Context Management        │              │
          └─────────────┼───────────────────────────────┼──────────────┘
                        │   • Multi-Agent Coordination  │
@@ -84,7 +84,7 @@ Ensure you have the following installed:
 
 ### Running the Application
 
-#### Agentic RAG Backend
+#### Agentic Backend
 ```bash
 cd biomedkai-backend
 
@@ -121,7 +121,7 @@ The platform will be available with full agentic AI capabilities, featuring auto
 | **Agentic Backend** | Python + RAG Framework | Multi-agent AI system with retrieval-augmented generation |
 | **LLM Inference** | Advanced Language Models | Medical text understanding and autonomous reasoning |
 | **Knowledge Graph** | Neo4j | Dynamic medical knowledge with semantic relationships |
-| **RAG System** | Vector Database + Retrieval | Context-aware knowledge augmentation |
+| **CARE-RAG System** | Vector Database + Retrieval | Context-aware knowledge augmentation |
 | **Agent Framework** | Multi-Agent Orchestration | Collaborative AI agent coordination |
 | **Deployment** | Docker | Containerized microservices architecture |
 
@@ -181,7 +181,7 @@ BioMed-KAI/
 
 The agentic platform exposes:
 - **Agent Orchestration**: `/api/agents/orchestrate`
-- **RAG Inference**: `/api/rag/generate`
+- **CARE-RAG Inference**: `/api/rag/generate`
 - **Knowledge Graph**: `/api/kg/query`
 - **Multi-Agent Chat**: `/api/agents/chat`
 - **Agent Status**: `/api/agents/status`
