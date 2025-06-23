@@ -245,13 +245,6 @@ BioMed-KAI is designed for academic and industry research in:
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
-
-- **NIPER** for providing computational infrastructure and research support
-- **Biomedical AI Research Community** for advancing agentic systems in medicine
-- **Neo4j Community** for graph database technology and knowledge representation
-- **RAG Research Community** for retrieval-augmented generation frameworks
-- **Medical Knowledge Curators** for high-quality biomedical data and validation
 
 ## 📞 Contact & Support
 
@@ -260,21 +253,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Issues**: GitHub Issues for bug reports and feature requests
 - **Agent Development**: Contact maintainers for agentic AI collaboration
 - **Knowledge Graph Access**: Repository owners for credentials and data access
-
-## 🔬 Research Impact
-
-BioMed-KAI contributes to the emerging field of **agentic AI in biomedicine**, enabling:
-- **Autonomous Scientific Discovery**: AI agents that can independently execute biomedical research tasks
-- **Collaborative Human-AI Research**: Systems that combine human creativity with AI's analytical capabilities
-- **Scalable Medical Knowledge Processing**: Handling vast biomedical datasets through intelligent agent coordination
-- **Real-time Clinical Decision Support**: Context-aware AI assistance for healthcare professionals
-
----
-
-<div align="center">
-
-**🤖 Pioneering Agentic AI for Precision Medicine 🧬**
-
-**Empowering the next generation of autonomous biomedical discovery**
-
-</div>
