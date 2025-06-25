@@ -465,7 +465,8 @@ class MedicalAgentOrchestrator:
             
         except Exception as e:
             self.logger.error("Error in direct query processing", error=str(e))
-            yield f"\n❌ **Error**: {str(e)}\n"
+            # yield f"\n❌ **Error**: {str(e)}\n"
+            yield "<||action||> ❌ An error occurred while processing your query. Please try again later.\n"
     
     async def _determine_agent(self, query: str) -> str:
         """Determine which agent should handle the query using BM25 algorithm"""

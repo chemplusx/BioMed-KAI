@@ -5,161 +5,192 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BioMed-KAI - Sources and References</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="description" content="Explore the comprehensive data sources and ontologies powering BioMed-KAI's knowledge graph.">
+    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/2.8.2/alpine.js" defer></script>
-    <!-- <link href="css/styles.css" rel="stylesheet"> -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <style>
-        /* Base styles */
-        html,
+        /* Light Theme Base */
         body {
-            height: 100%;
-            background-color: #0F172A;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%);
+            min-height: 100vh;
         }
 
-        body {
-            display: flex;
-            flex-direction: column;
+        /* Navigation */
+        .nav-glass {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
         }
 
-        main {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
+        /* Enhanced Sidebar */
+        .enhanced-sidebar {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(248, 250, 252, 0.9));
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
         }
 
-        /* Wave Animation Styles */
-        .wave-header {
+        .source-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+        }
+
+        .source-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .category-tag {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+        }
+
+        .icon-bg {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+        }
+
+        .nav-active {
+            color: #3b82f6;
+            border-bottom: 2px solid #3b82f6;
+        }
+
+        .search-box {
+            background: white;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .search-box:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .filter-btn {
+            background: white;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn.active {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+
+        .filter-btn:hover {
+            border-color: #3b82f6;
+        }
+
+        /* Navigation Links */
+        .nav-link {
+            transition: all 0.3s ease;
+            border-radius: 0.75rem;
+            color: #64748b;
+        }
+
+        .nav-link:hover {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+            transform: translateX(5px);
+        }
+
+        .nav-link.active {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+        }
+
+        /* Hero Section */
+        .hero-gradient {
+            background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 50%, #e2e8f0 100%);
             position: relative;
             overflow: hidden;
-            background: linear-gradient(45deg, #0F172A, #1E3A8A);
-            /* padding-bottom: 100px; */
         }
 
-        .wave-container {
+        .hero-gradient::before {
+            content: '';
             position: absolute;
-            width: 200%;
-            height: 100%;
-            bottom: 0;
+            top: 0;
             left: 0;
-            animation: wave-move 20s linear infinite;
-            transform: translateZ(0);
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 70% 30%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 30% 70%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+            pointer-events: none;
         }
 
-        .wave {
-            position: relative;
-            float: left;
-            width: 50%;
-            height: 100%;
-            background-repeat: repeat-x;
-            background-position: 0 bottom;
+        /* Stats Cards */
+        .stats-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
         }
 
-        .wave-container-1 {
-            opacity: 0.3;
-            animation-duration: 18s;
+        .stats-card:hover {
+            border-color: #3b82f6;
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.1);
         }
 
-        .wave-container-1 .wave {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 88.7'%3E%3Cpath d='M800 56.9c-155.5 0-204.9-50-405.5-49.9-200 0-250 49.9-394.5 49.9v31.8h800v-.2-31.6z' fill='%232563EB'/%3E%3C/svg%3E");
-        }
-
-        .wave-container-2 {
-            opacity: 0.6;
-            animation-duration: 15s;
-        }
-
-        .wave-container-2 .wave {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 88.7'%3E%3Cpath d='M800 56.9c-155.5 0-204.9-50-405.5-49.9-200 0-250 49.9-394.5 49.9v31.8h800v-.2-31.6z' fill='%231D4ED8'/%3E%3C/svg%3E");
-        }
-
-        .wave-container-3 {
-            opacity: 0.9;
-            animation-duration: 12s;
-        }
-
-        .wave-container-3 .wave {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 88.7'%3E%3Cpath d='M800 56.9c-155.5 0-204.9-50-405.5-49.9-200 0-250 49.9-394.5 49.9v31.8h800v-.2-31.6z' fill='%231E40AF'/%3E%3C/svg%3E");
-        }
-
-        @keyframes wave-move {
-            0% {
-                transform: translateX(0) translateZ(0);
-            }
-
-            100% {
-                transform: translateX(-50%) translateZ(0);
-            }
-        }
-
-        .sidebar {
-            background-color: #0F172A;
-        }
-
-        .glow-text {
-            text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
-        }
-
-        .fade-in {
-            opacity: 0;
-            animation: fadeIn 1s forwards;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
-            }
-        }
-
-
-        .highlight {
-            animation: highlight 1.5s ease-out;
-        }
-
-        @keyframes highlight {
-            from {
-                background-color: rgba(59, 130, 246, 0.6);
-                /* Light blue highlight */
-            }
-
-            to {
-                background-color: rgba(30, 41, 59, 0.5);
-                /* Default background */
-            }
-        }
-
-        .card-color {
-            color: black;
-            --tw-bg-opacity: 1;
-            background-color: rgb(201 214 255)
-        }
+        /* Type Color Mapping */
+        .type-protein { background: #dbeafe; color: #1e40af; }
+        .type-drug { background: #dcfce7; color: #166534; }
+        .type-genomics { background: #fce7f3; color: #be185d; }
+        .type-chemical { background: #fef3c7; color: #92400e; }
+        .type-studies { background: #fee2e2; color: #dc2626; }
+        .type-database { background: #f3f4f6; color: #374151; }
+        .type-pathways { background: #e0e7ff; color: #3730a3; }
+        .type-metabolomics { background: #fdf2f8; color: #c026d3; }
+        .type-anatomy { background: #fed7aa; color: #ea580c; }
+        .type-disease { background: #fecaca; color: #dc2626; }
+        .type-gene { background: #e0e7ff; color: #6366f1; }
+        .type-phenotype { background: #dbeafe; color: #2563eb; }
+        .type-experimental { background: #d1fae5; color: #059669; }
+        .type-clinical { background: #ccfbf1; color: #0f766e; }
+        .type-food { background: #fef3c7; color: #d97706; }
+        .type-symptom { background: #fee2e2; color: #dc2626; }
+        .type-cell { background: #e0e7ff; color: #4338ca; }
     </style>
 </head>
 
-<body class="bg-custom-dark text-gray-100" x-data="{ sidebarOpen: false }">
-    <!-- Sidebar -->
-    <div class="sidebar fixed top-0 left-0 h-full w-64 transform transition-transform duration-300 ease-in-out z-50"
+<body class="text-gray-900" x-data="{ sidebarOpen: false }">
+    <!-- Enhanced Sidebar -->
+    <div class="enhanced-sidebar fixed top-0 left-0 h-full w-72 transform transition-transform duration-300 ease-in-out z-50"
         :class="{ 'translate-x-0': sidebarOpen, '-translate-x-full': !sidebarOpen }">
         <div class="p-6">
-            <img src="static/BioMed-KAI-logo.png" alt="BioMed-KAI Logo" class="h-30 mb-8 filter invert">
+            <div class="flex items-center mb-8">
+                <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center mr-3">
+                    <i class="fas fa-brain text-white text-xl"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold text-gray-900">BioMed-KAI</h2>
+                    <p class="text-xs text-gray-600">Precision Medicine AI</p>
+                </div>
+            </div>
             <nav>
-                <ul class="space-y-4">
-                    <li><a href="home"
-                            class="text-gray-300 px-5 block py-2 hover:bg-blue-600 rounded transition duration-300">Home</a>
-                    </li>
-                    <li><a href="midas"
-                            class="text-white font-semibold px-5 block py-2 bg-blue-600 rounded transition duration-300">BioMed-KAI</a>
-                    </li>
-                    <li><a href="source"
-                            class="text-gray-300 px-5 block py-2 hover:bg-blue-600 rounded transition duration-300">Knowledge
-                            Graph</a></li>
-                    <!-- <li><a href="about"
-                        class="text-gray-300 px-5 block py-2 hover:bg-blue-600 rounded transition duration-300">About</a>
-                </li> -->
+                <ul class="space-y-3">
+                    <li><a href="home" class="nav-link flex items-center px-4 py-3 hover:text-blue-600 transition duration-300">
+                        <i class="fas fa-home mr-3"></i>Home
+                    </a></li>
+                    <li><a href="midas" class="nav-link flex items-center px-4 py-3 hover:text-blue-600 transition duration-300">
+                        <i class="fas fa-comments mr-3"></i>Chat Interface
+                    </a></li>
+                    <li><a href="source" class="nav-link active flex items-center px-4 py-3 font-semibold transition duration-300">
+                        <i class="fas fa-project-diagram mr-3"></i>Knowledge Graph
+                    </a></li>
                 </ul>
             </nav>
         </div>
@@ -167,322 +198,318 @@
 
     <div class="overlay fixed inset-0 bg-black opacity-50 z-40" x-show="sidebarOpen" @click="sidebarOpen = false"></div>
 
-    <main class="flex-grow">
-        <section class="wave-header text-white py-16">
-            <div class="wave-container wave-container-1">
-                <div class="wave"></div>
-                <div class="wave"></div>
-            </div>
-            <div class="wave-container wave-container-2">
-                <div class="wave"></div>
-                <div class="wave"></div>
-            </div>
-            <div class="wave-container wave-container-3">
-                <div class="wave"></div>
-                <div class="wave"></div>
-            </div>
+    <!-- Main Content -->
+    <main class="min-h-screen">
+        <!-- Navigation -->
+        <nav class="nav-glass fixed w-full top-0 z-40">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center py-4">
+                    <!-- Sidebar Toggle -->
+                    <button class="text-gray-600 hover:text-blue-600 transition-all duration-300 p-3 rounded-xl hover:bg-blue-50 focus-ring mr-4" 
+                            @click="sidebarOpen = !sidebarOpen" style="width: 5%; text-align: left;">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
 
-            <div class="sidebar-toggle absolute top-4 left-4 z-50" @click="sidebarOpen = !sidebarOpen">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="3" y1="12" x2="21" y2="12"></line>
-                    <line x1="3" y1="6" x2="21" y2="6"></line>
-                    <line x1="3" y1="18" x2="21" y2="18"></line>
-                </svg>
-            </div>
-            <div class="container mx-auto px-6 text-center relative z-10">
-                <h1 class="text-5xl md:text-6xl font-bold mb-4 glow-text">BioMed-KAI Chat</h1>
-                <p class="text-2xl mb-8 text-blue-400 glow-text">Your AI-Powered Precision Medicine Assistant</p>
-            </div>
-        </section>
+                    <div class="flex items-center space-x-3" style="width: 30%;text-align: left;">
+                        <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+                            <i class="fas fa-brain text-white text-lg"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-xl font-bold text-gray-900">BioMed-KAI</h1>
+                            <p class="text-xs text-gray-600">Sources</p>
+                        </div>
+                    </div>
+                    
+                    <div class="" style="width: 75%;text-align: right;">
+                        <a href="home" class="text-gray-600 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors">Home</a>
+                        <a href="source" class="nav-active px-3 py-2 text-sm font-medium transition-colors">Sources</a>
+                        <a href="midas" class="text-gray-600 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors">Chat</a>
+                        <a href="https://github.com/chemplusx/BioMed-KAI" target="_blank" class="text-gray-600 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors">
+                            <i class="fab fa-github mr-1"></i>GitHub
+                        </a>
+                    </div>
 
-
-
-        <section class="py-20">
-            <div class="container mx-auto px-6">
-                <div class="mb-16">
-                    <h2 class="text-3xl font-bold mb-8 text-center">
-                        <i class="fas fa-database mr-2 text-blue-600"></i>Databases (21)
-                    </h2>
-                    <div id="cardContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        <!-- Add more database cards here -->
+                    <!-- Mobile menu button -->
+                    <div class="md:hidden">
+                        <button id="mobile-menu-button" class="text-gray-600 hover:text-blue-600">
+                            <i class="fas fa-bars text-lg"></i>
+                        </button>
                     </div>
                 </div>
 
-                <div>
-                    <h2 class="text-3xl font-bold mb-8 text-center">
-                        <i class="fas fa-project-diagram mr-2 text-purple-600"></i>Ontologies (15)
-                    </h2>
-                    <div id="ontologyContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        <!-- Add more ontology cards here -->
+                <!-- Mobile menu -->
+                <div id="mobile-menu" class="hidden md:hidden pb-4">
+                    <div class="space-y-2">
+                        <a href="home" class="block px-3 py-2 text-gray-600 hover:text-blue-600">Home</a>
+                        <a href="source" class="block px-3 py-2 text-blue-600 font-medium">Sources</a>
+                        <a href="midas" class="block px-3 py-2 text-gray-600 hover:text-blue-600">Chat</a>
+                        <a href="https://github.com/chemplusx/BioMed-KAI" target="_blank" class="block px-3 py-2 text-gray-600 hover:text-blue-600">
+                            <i class="fab fa-github mr-1"></i>GitHub
+                        </a>
                     </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Header -->
+        <section class="hero-gradient pt-24 pb-16 px-4 sm:px-6 lg:px-8">
+            <div class="max-w-7xl mx-auto text-center relative z-10">
+                <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+                    Knowledge Sources
+                </h1>
+                <p class="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+                    Explore the comprehensive collection of databases and ontologies that power BioMed-KAI's knowledge graph
+                </p>
+                
+                <!-- Search and Filter -->
+                <div class="max-w-2xl mx-auto mb-8">
+                    <div class="relative">
+                        <input type="text" id="search-input" placeholder="Search sources..." 
+                               class="search-box w-full px-4 py-3 pl-12 rounded-xl focus:outline-none">
+                        <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                    </div>
+                </div>
+
+                <!-- Filter Buttons -->
+                <div class="flex flex-wrap justify-center gap-3 mb-8">
+                    <button class="filter-btn active px-4 py-2 rounded-full text-sm font-medium" data-filter="all">
+                        All Sources
+                    </button>
+                    <button class="filter-btn px-4 py-2 rounded-full text-sm font-medium" data-filter="database">
+                        Databases
+                    </button>
+                    <button class="filter-btn px-4 py-2 rounded-full text-sm font-medium" data-filter="ontology">
+                        Ontologies
+                    </button>
+                </div>
+
+                <!-- Stats -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl mx-auto">
+                    <div class="stats-card rounded-xl p-4 shadow-sm">
+                        <div class="text-2xl font-bold text-blue-600">21</div>
+                        <div class="text-sm text-gray-600">Databases</div>
+                    </div>
+                    <div class="stats-card rounded-xl p-4 shadow-sm">
+                        <div class="text-2xl font-bold text-purple-600">15</div>
+                        <div class="text-sm text-gray-600">Ontologies</div>
+                    </div>
+                    <div class="stats-card rounded-xl p-4 shadow-sm">
+                        <div class="text-2xl font-bold text-green-600">36</div>
+                        <div class="text-sm text-gray-600">Total Sources</div>
+                    </div>
+                    <div class="stats-card rounded-xl p-4 shadow-sm">
+                        <div class="text-2xl font-bold text-orange-600">200M+</div>
+                        <div class="text-sm text-gray-600">Relationships</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Databases Section -->
+        <section class="py-16 px-4 sm:px-6 lg:px-8" id="databases-section">
+            <div class="max-w-7xl mx-auto">
+                <h2 class="text-3xl font-bold text-gray-900 mb-8 text-center">
+                    <i class="fas fa-database text-blue-600 mr-3"></i>
+                    Integrated Databases (21)
+                </h2>
+                
+                <div id="databases-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Database cards will be populated by JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Ontologies Section -->
+        <section class="py-16 px-4 sm:px-6 lg:px-8 bg-gray-50" id="ontologies-section">
+            <div class="max-w-7xl mx-auto">
+                <h2 class="text-3xl font-bold text-gray-900 mb-8 text-center">
+                    <i class="fas fa-project-diagram text-purple-600 mr-3"></i>
+                    Medical Ontologies (15)
+                </h2>
+                
+                <div id="ontologies-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Ontology cards will be populated by JavaScript -->
                 </div>
             </div>
         </section>
     </main>
 
-    <footer class="bg-gray-800 text-white py-8">
-        <div class="container mx-auto px-6 text-center">
-            <p>&copy; 2024 BioMed-KAI. Empowering Precision Medicine with Advanced AI and Dynamic Knowledge Graphs. All rights reserved.</p>
-        </div>
-    </footer>
+    <!-- Footer -->
+    <footer class="bg-white py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto text-center">
+            <div class="flex items-center justify-center space-x-3 mb-4">
+                <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-brain text-white"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-gray-900">BioMed-KAI</h3>
+                    <p class="text-sm text-gray-600">Knowledge Sources</p>
+                </div>
+            </div>
+            <p class="text-gray-600 mb-4">
+                Comprehensive biomedical knowledge integration for precision medicine
+            </p>
+            <div class="flex justify-center space-x-4">
+                <a href="home" class="text-gray-600 hover:text-blue-600 transition-colors">Home</a>
+                <a href="midas" class="text-gray-600 hover:text-blue-600 transition-colors">Chat</a>
+                <a href="https://github.com/chemplusx/BioMed-KAI" target="_blank" class="text-gray-600 hover:text-blue-600 transition-colors">GitHub</a>
+            </div>
+        </footer>
 
     <script>
+        // Data sources
         const databases = [
-            {
-                "Datasource": "Uberon (Uber-anatomy Ontology)",
-                "Version": "2024-09-03",
-                "Data Access": "File Download: https://obophenotype.github.io/uberon/current_release/",
-                "Type": "Anatomy"
-            },
-            {
-                "Datasource": "UniProt (Universal Protein Resource)",
-                "Version": "v07-2024",
-                "Data Access": "FTP Access: https://ftp.uniprot.org/pub/databases/uniprot/current_release/",
-                "Type": "Protein"
-            },
-            {
-                "Datasource": "OpenTargets",
-                "Version": "24.06",
-                "Data Access": "FTP Access: http://ftp.ebi.ac.uk/pub/databases/opentargets/platform",
-                "Type": "Genomics"
-            },
-            {
-                "Datasource": "Ensembl",
-                "Version": "112",
-                "Data Access": "FTP Access: https://ftp.ensembl.org/pub/current_genbank/",
-                "Type": "Genomics"
-            },
-            {
-                "Datasource": "HGNC (HUGO Gene Nomenclature Committee)",
-                "Version": "v2024-08-23",
-                "Data Access": "File Download: https://www.genenames.org/download/statistics-and-files/",
-                "Type": "Genomics"
-            },
-            {
-                "Datasource": "ChEBI (Chemical Entities of Biological Interest)",
-                "Version": "v08-2024",
-                "Data Access": "SQL DUmp: https://www.ebi.ac.uk/chebi/downloadsForward.do",
-                "Type": "Chemical"
-            },
-            {
-                "Datasource": "InACT (Interaction Network Analysis Computational Tool)",
-                "Version": "v2024-05-20",
-                "Data Access": "FTP access: https://www.ebi.ac.uk/intact/download/ftp",
-                "Type": "Protein"
-            },
-            {
-                "Datasource": "TTD (Therapeutic Target Database)",
-                "Version": "10.1.01",
-                "Data Access": "File Download: https://idrblab.net/ttd/full-data-download",
-                "Type": "Drug"
-            },
-            {
-                "Datasource": "Marker DB",
-                "Version": "2",
-                "Data Access": "File Download: https://markerdb.ca/downloads",
-                "Type": "Genomics"
-            },
-            {
-                "Datasource": "DrugBank",
-                "Version": "5.1.12",
-                "Data Access": "File Download: Access on request",
-                "Type": "Drug"
-            },
-            {
-                "Datasource": "DrugCentral",
-                "Version": "v2023-05",
-                "Data Access": "SQL Dump: https://drugcentral.org/ActiveDownload",
-                "Type": "Drug"
-            },
-            {
-                "Datasource": "GWAS Catalog (Genome-Wide Association Studies Catalog)",
-                "Version": "V1.0.3.1",
-                "Data Access": "File Download: https://www.ebi.ac.uk/gwas/docs/file-downloads",
-                "Type": "Studies"
-            },
-            {
-                "Datasource": "HPA (Human Protein Atlas)",
-                "Version": "23",
-                "Data Access": "File Download: https://www.proteinatlas.org/about/download",
-                "Type": "Protein"
-            },
-            {
-                "Datasource": "Reactome",
-                "Version": "v89",
-                "Data Access": "File Download: https://reactome.org/download-data",
-                "Type": "Pathways"
-            },
-            {
-                "Datasource": "dbSNP (Database of Single Nucleotide Polymorphisms)",
-                "Version": "v2023-01-25",
-                "Data Access": "FTP Access: https://ftp.ncbi.nih.gov/snp/",
-                "Type": "Genomics"
-            },
-            {
-                "Datasource": "HMDB (Human Metabolome Database)",
-                "Version": "v5",
-                "Data Access": "File Download: https://hmdb.ca/downloads",
-                "Type": "Metabolomics"
-            },
-            {
-                "Datasource": "PubMed",
-                "Version": "v2023-12-15",
-                "Data Access": "FTP Access: https://ftp.ncbi.nlm.nih.gov/pubmed/baseline/",
-                "Type": "Studies"
-            },
-            {
-                "Datasource": "EMBL-EBI (European Molecular Biology Laboratory-European Bioinformatics Institute)",
-                "Version": "v2024_04",
-                "Data Access": "Rest API + SparQL: https://www.ebi.ac.uk/services",
-                "Type": "Database"
-            },
-            {
-                "Datasource": "BioStudies",
-                "Version": "v2024-08",
-                "Data Access": "Rest API Access: https://www.ebi.ac.uk/biostudies/api/v1/search",
-                "Type": "Studies"
-            },
-            {
-                "Datasource": "PDB (Protein Data Bank)",
-                "Version": "v2024-08-30",
-                "Data Access": "FTP Access: ftp://ftp.wwpdb.org/",
-                "Type": "Protein"
-            },
-            {
-                "Datasource": "NCBI (National Center for Biotechnology Information)",
-                "Version": "v2023-12-07",
-                "Data Access": "FTP access: https://ftp.ncbi.nlm.nih.gov/",
-                "Type": "Database"
-            }
+            { name: "Uberon", description: "Uber-anatomy Ontology", version: "2024-09-03", type: "Anatomy", category: "database", icon: "fas fa-brain", url: "https://obophenotype.github.io/uberon/current_release/" },
+            { name: "UniProt", description: "Universal Protein Resource", version: "v07-2024", type: "Protein", category: "database", icon: "fas fa-dna", url: "https://ftp.uniprot.org/pub/databases/uniprot/current_release/" },
+            { name: "OpenTargets", description: "Target Identification Platform", version: "24.06", type: "Genomics", category: "database", icon: "fas fa-bullseye", url: "http://ftp.ebi.ac.uk/pub/databases/opentargets/platform" },
+            { name: "Ensembl", description: "Genome Annotation Database", version: "112", type: "Genomics", category: "database", icon: "fas fa-dna", url: "https://ftp.ensembl.org/pub/current_genbank/" },
+            { name: "HGNC", description: "HUGO Gene Nomenclature Committee", version: "v2024-08-23", type: "Genomics", category: "database", icon: "fas fa-gene", url: "https://www.genenames.org/download/statistics-and-files/" },
+            { name: "ChEBI", description: "Chemical Entities of Biological Interest", version: "v08-2024", type: "Chemical", category: "database", icon: "fas fa-flask", url: "https://www.ebi.ac.uk/chebi/downloadsForward.do" },
+            { name: "IntAct", description: "Protein Interaction Database", version: "v2024-05-20", type: "Protein", category: "database", icon: "fas fa-handshake", url: "https://www.ebi.ac.uk/intact/download/ftp" },
+            { name: "TTD", description: "Therapeutic Target Database", version: "10.1.01", type: "Drug", category: "database", icon: "fas fa-bullseye", url: "https://idrblab.net/ttd/full-data-download" },
+            { name: "MarkerDB", description: "Biomarker Database", version: "2", type: "Genomics", category: "database", icon: "fas fa-chart-bar", url: "https://markerdb.ca/downloads" },
+            { name: "DrugBank", description: "Drug and Drug Target Database", version: "5.1.12", type: "Drug", category: "database", icon: "fas fa-capsules", url: "https://drugbank.ca" },
+            { name: "DrugCentral", description: "Drug Information Resource", version: "v2023-05", type: "Drug", category: "database", icon: "fas fa-pills", url: "https://drugcentral.org/ActiveDownload" },
+            { name: "GWAS Catalog", description: "Genome-Wide Association Studies", version: "V1.0.3.1", type: "Studies", category: "database", icon: "fas fa-chart-line", url: "https://www.ebi.ac.uk/gwas/docs/file-downloads" },
+            { name: "HPA", description: "Human Protein Atlas", version: "23", type: "Protein", category: "database", icon: "fas fa-microscope", url: "https://www.proteinatlas.org/about/download" },
+            { name: "Reactome", description: "Pathway Database", version: "v89", type: "Pathways", category: "database", icon: "fas fa-sitemap", url: "https://reactome.org/download-data" },
+            { name: "dbSNP", description: "Single Nucleotide Polymorphisms", version: "v2023-01-25", type: "Genomics", category: "database", icon: "fas fa-dna", url: "https://ftp.ncbi.nih.gov/snp/" },
+            { name: "HMDB", description: "Human Metabolome Database", version: "v5", type: "Metabolomics", category: "database", icon: "fas fa-atom", url: "https://hmdb.ca/downloads" },
+            { name: "PubMed", description: "Biomedical Literature Database", version: "v2023-12-15", type: "Studies", category: "database", icon: "fas fa-book-medical", url: "https://ftp.ncbi.nlm.nih.gov/pubmed/baseline/" },
+            { name: "EMBL-EBI", description: "European Bioinformatics Institute", version: "v2024_04", type: "Database", category: "database", icon: "fas fa-database", url: "https://www.ebi.ac.uk/services" },
+            { name: "BioStudies", description: "Biological Studies Database", version: "v2024-08", type: "Studies", category: "database", icon: "fas fa-search", url: "https://www.ebi.ac.uk/biostudies/api/v1/search" },
+            { name: "PDB", description: "Protein Data Bank", version: "v2024-08-30", type: "Protein", category: "database", icon: "fas fa-cube", url: "ftp://ftp.wwpdb.org/" },
+            { name: "NCBI", description: "National Center for Biotechnology Information", version: "v2023-12-07", type: "Database", category: "database", icon: "fas fa-database", url: "https://ftp.ncbi.nlm.nih.gov/" }
         ];
 
-
         const ontologies = [
-            {
-                "Ontology": "MonDO (Monarch Disease Ontology)",
-                "Version": "v2024-09-03",
-                "Data Access": "File Download: https://monarchinitiative.org/ontology/mondo.owl",
-                "Type": "Disease"
-            },
-            {
-                "Ontology": "Uberon (Uber-anatomy Ontology)",
-                "Version": "2024-09-03",
-                "Data Access": "File Download: https://obophenotype.github.io/uberon/current_release/",
-                "Type": "Anatomy"
-            },
-            {
-                "Ontology": "PO (Protein Ontology)",
-                "Version": "v2024-08-30",
-                "Data Access": "File Download: http://purl.obolibrary.org/obo/po.owl",
-                "Type": "Protein"
-            },
-            {
-                "Ontology": "GO (Gene Ontology)",
-                "Version": "v2024-09-01",
-                "Data Access": "File Download: http://purl.obolibrary.org/obo/go.owl",
-                "Type": "Gene"
-            },
-            {
-                "Ontology": "HPO (Human Phenotype Ontology)",
-                "Version": "v2024-09-01",
-                "Data Access": "File Download: http://purl.obolibrary.org/obo/hp.owl",
-                "Type": "Phenotype"
-            },
-            {
-                "Ontology": "EFO (Experimental Factor Ontology)",
-                "Version": "v2024-09-01",
-                "Data Access": "File Download: http://purl.obolibrary.org/obo/efo.owl",
-                "Type": "Experimental Factor"
-            },
-            {
-                "Ontology": "ChEBI ontology",
-                "Version": "v2024-09-01",
-                "Data Access": "File Download: http://purl.obolibrary.org/obo/chebi.owl",
-                "Type": "Chemical"
-            },
-            {
-                "Ontology": "HDO (Human Disease Ontology)",
-                "Version": "v2024-09-01",
-                "Data Access": "File Download: http://purl.obolibrary.org/obo/doid.owl",
-                "Type": "Disease"
-            },
-            {
-                "Ontology": "SNOMED CT (Systematized Nomenclature of Medicine - Clinical Terms)",
-                "Version": "v2024-09-01",
-                "Data Access": "File Download: http://purl.obolibrary.org/obo/snomed.owl",
-                "Type": "Drug"
-            },
-            {
-                "Ontology": "Food Ontology",
-                "Version": "v2024-09-01",
-                "Data Access": "File Download: http://purl.obolibrary.org/obo/foodon.owl",
-                "Type": "Food"
-            },
-            {
-                "Ontology": "Symptom Ontology",
-                "Version": "v2024-09-01",
-                "Data Access": "File Download: http://purl.obolibrary.org/obo/symp.owl",
-                "Type": "Symptom"
-            },
-            {
-                "Ontology": "Orphanet",
-                "Version": "v2024-09-01",
-                "Data Access": "File Download: http://purl.obolibrary.org/obo/orphanet.owl",
-                "Type": "Disease"
-            },
-            {
-                "Ontology": "OMIM (Online Mendelian Inheritance in Man)",
-                "Version": "v2024-09-01",
-                "Data Access": "File Download: http://purl.obolibrary.org/obo/omim.owl",
-                "Type": "Disease"
-            }
-        ]
-        function getIconClass(dataSource) {
-            const lowerCaseSource = dataSource.toLowerCase();
-            if (lowerCaseSource.includes('protein') || lowerCaseSource.includes('gene')) return 'fa-dna';
-            if (lowerCaseSource.includes('drug') || lowerCaseSource.includes('chemical')) return 'fa-capsules';
-            if (lowerCaseSource.includes('study') || lowerCaseSource.includes('pubmed')) return 'fa-book-medical';
-            if (lowerCaseSource.includes('database') || lowerCaseSource.includes('catalog')) return 'fa-database';
-            if (lowerCaseSource.includes('pathway')) return 'fa-sitemap';
-            if (lowerCaseSource.includes('metabol')) return 'fa-flask';
-            if (lowerCaseSource.includes('anatomy')) return 'fa-brain';
-            if (lowerCaseSource.includes('ontology')) return 'fa-project-diagram';
-            if (lowerCaseSource.includes('interaction')) return 'fa-handshake';
-            if (lowerCaseSource.includes('target')) return 'fa-bullseye';
-            if (lowerCaseSource.includes('gwas')) return 'fa-chart-bar';
-            if (lowerCaseSource.includes('disease')) return 'fa-procedures';
+            { name: "MonDO", description: "Monarch Disease Ontology", version: "v2024-09-03", type: "Disease", category: "ontology", icon: "fas fa-procedures", url: "https://monarchinitiative.org/ontology/mondo.owl" },
+            { name: "Uberon", description: "Uber-anatomy Ontology", version: "2024-09-03", type: "Anatomy", category: "ontology", icon: "fas fa-brain", url: "https://obophenotype.github.io/uberon/current_release/" },
+            { name: "PO", description: "Protein Ontology", version: "v2024-08-30", type: "Protein", category: "ontology", icon: "fas fa-dna", url: "http://purl.obolibrary.org/obo/po.owl" },
+            { name: "GO", description: "Gene Ontology", version: "v2024-09-01", type: "Gene", category: "ontology", icon: "fas fa-gene", url: "http://purl.obolibrary.org/obo/go.owl" },
+            { name: "HPO", description: "Human Phenotype Ontology", version: "v2024-09-01", type: "Phenotype", category: "ontology", icon: "fas fa-user-md", url: "http://purl.obolibrary.org/obo/hp.owl" },
+            { name: "EFO", description: "Experimental Factor Ontology", version: "v2024-09-01", type: "Experimental Factor", category: "ontology", icon: "fas fa-flask", url: "http://purl.obolibrary.org/obo/efo.owl" },
+            { name: "ChEBI", description: "Chemical Entities Ontology", version: "v2024-09-01", type: "Chemical", category: "ontology", icon: "fas fa-flask", url: "http://purl.obolibrary.org/obo/chebi.owl" },
+            { name: "HDO", description: "Human Disease Ontology", version: "v2024-09-01", type: "Disease", category: "ontology", icon: "fas fa-procedures", url: "http://purl.obolibrary.org/obo/doid.owl" },
+            { name: "SNOMED CT", description: "Clinical Terms", version: "v2024-09-01", type: "Clinical", category: "ontology", icon: "fas fa-stethoscope", url: "http://purl.obolibrary.org/obo/snomed.owl" },
+            { name: "FoodOn", description: "Food Ontology", version: "v2024-09-01", type: "Food", category: "ontology", icon: "fas fa-apple-alt", url: "http://purl.obolibrary.org/obo/foodon.owl" },
+            { name: "SYMP", description: "Symptom Ontology", version: "v2024-09-01", type: "Symptom", category: "ontology", icon: "fas fa-thermometer-half", url: "http://purl.obolibrary.org/obo/symp.owl" },
+            { name: "Orphanet", description: "Rare Disease Ontology", version: "v2024-09-01", type: "Disease", category: "ontology", icon: "fas fa-procedures", url: "http://purl.obolibrary.org/obo/orphanet.owl" },
+            { name: "OMIM", description: "Online Mendelian Inheritance", version: "v2024-09-01", type: "Disease", category: "ontology", icon: "fas fa-dna", url: "http://purl.obolibrary.org/obo/omim.owl" },
+            { name: "CL", description: "Cell Ontology", version: "v2024-09-01", type: "Cell", category: "ontology", icon: "fas fa-circle", url: "http://purl.obolibrary.org/obo/cl.owl" },
+            { name: "PATO", description: "Phenotype Attribute Ontology", version: "v2024-09-01", type: "Phenotype", category: "ontology", icon: "fas fa-eye", url: "http://purl.obolibrary.org/obo/pato.owl" }
+        ];
 
-            return 'fa-microscope';
+        function getTypeColor(type) {
+            const colors = {
+                'Protein': 'type-protein',
+                'Drug': 'type-drug',
+                'Genomics': 'type-genomics',
+                'Chemical': 'type-chemical',
+                'Studies': 'type-studies',
+                'Database': 'type-database',
+                'Pathways': 'type-pathways',
+                'Metabolomics': 'type-metabolomics',
+                'Anatomy': 'type-anatomy',
+                'Disease': 'type-disease',
+                'Gene': 'type-gene',
+                'Phenotype': 'type-phenotype',
+                'Experimental Factor': 'type-experimental',
+                'Clinical': 'type-clinical',
+                'Food': 'type-food',
+                'Symptom': 'type-symptom',
+                'Cell': 'type-cell'
+            };
+            return colors[type] || 'type-database';
         }
 
-        function createCard(item) {
-            const [accessType, url] = item["Data Access"].split(': ');
-            const iconClass = getIconClass(item.Type);
-
+        function createSourceCard(source) {
             return `
-                <div class="card-color rounded-lg shadow-lg p-6 source-card">
-                    <div class="flex items-center mb-4">
-                        <i class="fas ${iconClass} text-3xl text-blue-600 mr-4"></i>
-                        <h3 class="text-xl font-semibold">${(item.Datasource || item.Ontology).split(' (')[0]}</h3>
+                <div class="source-card rounded-2xl p-6 source-item" data-category="${source.category}" data-name="${source.name.toLowerCase()}" data-description="${source.description.toLowerCase()}">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="icon-bg w-12 h-12 rounded-xl flex items-center justify-center">
+                            <i class="${source.icon} text-xl"></i>
+                        </div>
+                        <span class="category-tag">${source.category === 'database' ? 'Database' : 'Ontology'}</span>
                     </div>
-                    <p class="text-gray-600 mb-2">${(item.Datasource || item.Ontology).includes('(') ? (item.Datasource || item.Ontology).split('(')[1].replace(')', '') : ''}</p>
-                    <p class="text-sm text-gray-500 mb-4">Version: ${item.Version}</p>
-                    <a href="${url}" class="text-blue-600 hover:underline flex items-center" target="_blank" rel="noopener noreferrer">
-                        <i class="fas fa-external-link-alt mr-2"></i>${accessType}
+                    
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">${source.name}</h3>
+                    <p class="text-gray-600 mb-3">${source.description}</p>
+                    
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-sm text-gray-500">Version: ${source.version}</span>
+                        <span class="px-3 py-1 rounded-full text-xs font-medium ${getTypeColor(source.type)}">${source.type}</span>
+                    </div>
+                    
+                    <a href="${source.url}" target="_blank" class="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium transition-colors">
+                        <i class="fas fa-external-link-alt mr-2 text-sm"></i>
+                        Access Source
                     </a>
                 </div>
             `;
         }
 
-        const cardContainer = document.getElementById('cardContainer');
-        databases.forEach(item => {
-            cardContainer.innerHTML += createCard(item);
+        // Populate grids
+        document.getElementById('databases-grid').innerHTML = databases.map(createSourceCard).join('');
+        document.getElementById('ontologies-grid').innerHTML = ontologies.map(createSourceCard).join('');
+
+        // Filter functionality
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        const sourceItems = document.querySelectorAll('.source-item');
+        const searchInput = document.getElementById('search-input');
+
+        filterButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Update active button
+                filterButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                
+                const filter = button.getAttribute('data-filter');
+                filterSources(filter, searchInput.value);
+            });
         });
 
-        const ontologyContainer = document.getElementById('ontologyContainer');
-        ontologies.forEach(item => {
-            ontologyContainer.innerHTML += createCard(item);
+        // Search functionality
+        searchInput.addEventListener('input', (e) => {
+            const activeFilter = document.querySelector('.filter-btn.active').getAttribute('data-filter');
+            filterSources(activeFilter, e.target.value);
+        });
+
+        function filterSources(category, searchTerm) {
+            sourceItems.forEach(item => {
+                const itemCategory = item.getAttribute('data-category');
+                const itemName = item.getAttribute('data-name');
+                const itemDescription = item.getAttribute('data-description');
+                
+                const matchesCategory = category === 'all' || itemCategory === category;
+                const matchesSearch = !searchTerm || 
+                                    itemName.includes(searchTerm.toLowerCase()) || 
+                                    itemDescription.includes(searchTerm.toLowerCase());
+                
+                if (matchesCategory && matchesSearch) {
+                    item.style.display = 'block';
+                    item.style.animation = 'fadeInUp 0.5s ease forwards';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+
+            // Show/hide sections based on visible items
+            updateSectionVisibility();
+        }
+
+        function updateSectionVisibility() {
+            const visibleDatabases = document.querySelectorAll('#databases-grid .source-item[style*="block"]').length;
+            const visibleOntologies = document.querySelectorAll('#ontologies-grid .source-item[style*="block"]').length;
+            
+            document.getElementById('databases-section').style.display = visibleDatabases > 0 ? 'block' : 'none';
+            document.getElementById('ontologies-section').style.display = visibleOntologies > 0 ? 'block' : 'none';
+        }
+
+        // Mobile menu toggle
+        document.getElementById('mobile-menu-button').addEventListener('click', function() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
         });
     </script>
 </body>
