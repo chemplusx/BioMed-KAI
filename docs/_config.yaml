@@ -49,7 +49,6 @@ exclude:
   - Gemfile.lock
   - node_modules
   - README.md
-  - analysis/interactive
 
 # Collections
 collections:
