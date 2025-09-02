@@ -1,0 +1,34 @@
+# BioMed-KAI Documentation Site
+title: BioMed-KAI
+description: Context-Aware Retrieval Framework for Biomedical Knowledge Integration
+baseurl: "/BioMed-KAI"
+url: "https://chemplusx.github.io"
+
+# Build settings
+markdown: kramdown
+highlighter: rouge
+
+# Plugins
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+
+# Navigation
+header_pages:
+  - analysis/index.md
+
+# Exclude from processing
+exclude:
+  - README.md
+  - LICENSE
+  - vendor/
+  - .sass-cache/
+  - .jekyll-cache/
+  - gemfiles/
+  - Gemfile
+  - Gemfile.lock
+  - node_modules/
+  - advanced_analysis_results/
+  - analysis/
+  - biomedkai-backend/
+  - scripts/
