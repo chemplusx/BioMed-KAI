@@ -215,6 +215,30 @@ class CustomMedicalAgent(BaseAgent):
 - **Knowledge Coverage**: 50M+ medical entities and relationships
 - **Agent Coordination**: Sub-second inter-agent communication
 
+
+## Analysis Results
+
+Explore our comprehensive analysis results and interactive visualizations:
+
+🔬 **[View Complete Analysis Dashboard](/analysis/)** - Interactive exploration of all performance metrics, statistical validation, and comparative benchmarks.
+
+Key highlights:
+- 85.7% diagnostic accuracy with 66.5% token efficiency improvement
+- Multi-agent architecture provides 6.8-7.9% performance gains
+- CARE-RAG framework achieves 39.3% improvement over baseline
+- Statistical significance confirmed (p < 0.001) across all metrics
+
+[View Interactive Results](/analysis/) | [Download Analysis Data](https://github.com/chemplusx/BioMed-KAI/tree/master/analysis_results)
+```
+
+### Deployment Instructions
+
+1. **Run your analysis scripts** to generate the interactive HTML files
+2. **Execute the integration script** to copy files to the correct GitHub Pages structure
+3. **Commit and push** the docs folder to your repository
+4. **Enable GitHub Pages** in your repository settings (if not already enabled)
+5. **Access your analysis results** at `https://chemplusx.github.io/BioMed-KAI/analysis/`
+
 ## 🤝 Contributing
 
 We welcome contributions to advance agentic AI in medicine!
