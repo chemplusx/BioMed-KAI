@@ -38,6 +38,7 @@ highlighter: rouge
 include:
   - _pages
   - assets
+  - .nojekyll
 
 exclude:
   - vendor
