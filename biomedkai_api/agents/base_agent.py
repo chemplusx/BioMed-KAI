@@ -138,8 +138,23 @@ class BaseMedicalAgent(ABC):
         return None
     
     def _get_relevant_entity_types(self) -> List[str]:
-        """Get entity types relevant to this agent - override in subclasses"""
-        return ["Disease", "Drug", "Symptom", "Gene", "Protein", "Metabolite", "Pathway"]
+        """Get entity types relevant to this agent - override in subclasses
+        
+        Available entity types in the KG (from node-prop.csv):
+        - Anatomy: Body parts and anatomical structures
+        - BiologicalProcess: Cellular/molecular processes
+        - CellularComponent: Cell organelles and structures  
+        - Compound: Chemical compounds and small molecules
+        - Disease: Medical conditions and diseases
+        - Drug: Medications and pharmaceutical agents
+        - Effect/Phenotype: Observable characteristics and effects
+        - Gene: Genetic elements
+        - MolecularFunction: Molecular-level functions
+        - Pathway: Biological pathways
+        - Pharmacologic Class: Drug classifications
+        - Symptom: Clinical symptoms (from Symptom label)
+        """
+        return ["Disease", "Drug", "Symptom", "Gene", "Compound", "Pathway", "Effect/Phenotype", "Anatomy"]
     
     def _create_enhanced_prompt(self, query: str, context: Dict[str, Any], state: MedicalAssistantState) -> str:
         """Create enhanced prompt with context - override in subclasses for agent-specific prompts"""
@@ -151,21 +166,45 @@ class BaseMedicalAgent(ABC):
         context_str = ""
         kg_context = context.get("knowledge_graph", {})
         
+        # Format KG context with actual entity details
         if kg_context.get("context"):
             context_str += f"\n**Medical Knowledge Base Context:**\n{kg_context['context']}\n"
         
-        if kg_context.get("entities"):
-            context_str += f"\n**Relevant Medical Entities:** {len(kg_context['entities'])} found\n"
+        # Format entities with names and types
+        entities = kg_context.get("entities", [])
+        if entities:
+            context_str += f"\n**Relevant Medical Entities ({len(entities)} found):**\n"
+            for ent in entities[:10]:  # Top 10 entities
+                name = ent.get("name", "Unknown")
+                # Get type from labels or o_label
+                labels = ent.get("labels", [])
+                o_label = ent.get("o_label", "")
+                ent_type = o_label if o_label else (labels[0] if labels else "Unknown")
+                # Skip generic labels
+                if ent_type in ["AllEntries", "Entity"]:
+                    ent_type = labels[1] if len(labels) > 1 else "Medical Entity"
+                score = ent.get("score", 0)
+                context_str += f"- {name} (Type: {ent_type}, Relevance: {score:.2f})\n"
             
-        if kg_context.get("relationships"):
-            context_str += f"**Medical Relationships:** {len(kg_context['relationships'])} connections\n"
+        # Format relationships with source -> type -> target
+        relationships = kg_context.get("relationships", [])
+        if relationships:
+            context_str += f"\n**Medical Relationships ({len(relationships)} connections):**\n"
+            for rel in relationships[:15]:  # Top 15 relationships
+                source = rel.get("source", {})
+                target = rel.get("target", {})
+                rel_type = rel.get("type", "RELATED_TO")
+                src_name = source.get("name", "Unknown")
+                tgt_name = target.get("name", "Unknown")
+                context_str += f"- {src_name} --[{rel_type}]--> {tgt_name}\n"
         
         # Add patient context
         patient_context = context.get("patient_context", {})
         if patient_context:
             context_str += f"\n**Patient Context:**\n"
             for key, value in patient_context.items():
-                context_str += f"- {key}: {value}\n"
+                if value:  # Only add non-empty values
+                    context_str += f"- {key}: {value}\n"
         
         # Add previous findings from state
         if state.get("symptoms"):
@@ -185,9 +224,9 @@ class BaseMedicalAgent(ABC):
 **User Query:** {query}
 
 **Instructions:**
-1. Analyze the query in context of the provided medical information
-2. Provide accurate, evidence-based information relevant to your specialization
-3. Use the medical knowledge base context when applicable
+1. Analyze the query using the medical knowledge base context provided above
+2. Reference specific entities and relationships from the knowledge graph when relevant
+3. Provide accurate, evidence-based information relevant to your specialization
 4. Acknowledge any limitations or uncertainties
 5. Recommend professional medical consultation when appropriate
 

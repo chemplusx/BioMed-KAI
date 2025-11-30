@@ -421,14 +421,21 @@ class MedicalAgentOrchestrator:
             if kg_tool:
                 kg_results = await kg_tool.execute(
                     query=query,
-                    entity_types=["Disease", "Drug", "Symptom", "Gene", "Protein", "Metabolite", "Pathway"],
-                    limit=5,
+                    entity_types=["Disease", "Drug", "Compound", "Symptom", "Gene", "Protein", "Metabolite", "Pathway", "Phenotype"],
+                    limit=15,
                     include_relationships=True
                 )
                 
                 context_info = kg_results.get("context", "")
                 entities_found = len(kg_results.get("entities", []))
                 relationships_found = len(kg_results.get("relationships", []))
+                
+                # Debug: Print kg_results structure
+                print(f"[Orchestrator] KG Results: entities={entities_found}, relationships={relationships_found}")
+                if kg_results.get("entities"):
+                    print(f"[Orchestrator] First entity: {kg_results['entities'][0] if kg_results['entities'] else 'None'}")
+                if kg_results.get("error"):
+                    print(f"[Orchestrator] KG Error: {kg_results.get('error')}")
                 
                 # Extract references/publications from KG results
                 references = self._extract_references(kg_results)
@@ -484,7 +491,7 @@ class MedicalAgentOrchestrator:
             async for chunk in self.model.generate_with_context(
                 enhanced_prompt, 
                 chat_history, 
-                use_rag=True  # We already have context
+                use_rag=False  # We already fetched KG context in Step 1
             ):
                 full_response += chunk
                 yield chunk
@@ -569,14 +576,17 @@ class MedicalAgentOrchestrator:
     def _extract_essential_kg_data(self, kg_results: Dict[str, Any]) -> Dict[str, Any]:
         """Extract only essential KG data for UI display (not the entire dump)"""
         if not kg_results:
+            print("[Orchestrator] _extract_essential_kg_data: kg_results is empty/None")
             return {
                 "major_entities": [],
                 "entity_count": 0,
-                "relationship_count": 0
+                "relationship_count": 0,
+                "relationships": []
             }
         
         entities = kg_results.get("entities", [])
         relationships = kg_results.get("relationships", [])
+        print(f"[Orchestrator] _extract_essential_kg_data: processing {len(entities)} entities, {len(relationships)} relationships")
         
         # Extract only essential info from entities (name, type, score if available)
         major_entities = []
@@ -588,19 +598,27 @@ class MedicalAgentOrchestrator:
         for entity in entity_list[:10]:  # Top 10 only
             if isinstance(entity, dict):
                 # Get entity name - try multiple possible keys
+                props = entity.get("properties", {}) if isinstance(entity.get("properties"), dict) else {}
                 name = (entity.get("name") or 
                        entity.get("text") or 
-                       entity.get("label") or 
+                       props.get("name") or
                        entity.get("DisplayName") or
-                       entity.get("properties", {}).get("name") if isinstance(entity.get("properties"), dict) else None or
                        "Unknown")
                 
-                # Get entity type
-                entity_type = (entity.get("type") or 
-                             entity.get("NodeType") or 
-                             entity.get("label") or
-                             entity.get("metadata") or
-                             "Unknown")
+                # Get entity type - check labels list first, then type field
+                labels = entity.get("labels", [])
+                # Filter out generic labels
+                specific_labels = [l for l in labels if l not in ['AllEntries', 'Node', 'Entity']] if isinstance(labels, list) else []
+                
+                entity_type = (
+                    entity.get("type") or  # Explicit type field
+                    (specific_labels[0] if specific_labels else None) or  # First specific label
+                    (labels[0] if isinstance(labels, list) and labels else None) or  # First label
+                    entity.get("o_label") or  # Original label from properties
+                    props.get("o_label") or  # Original label in properties
+                    entity.get("NodeType") or 
+                    "Unknown"
+                )
                 
                 # Get score if available
                 score = entity.get("score", 0.0)
@@ -620,10 +638,26 @@ class MedicalAgentOrchestrator:
                         "score": float(score)
                     })
         
+        # Extract essential relationship info
+        essential_relationships = []
+        if isinstance(relationships, list):
+            for rel in relationships[:10]:  # Top 10 relationships
+                if isinstance(rel, dict):
+                    source = rel.get("source", {})
+                    target = rel.get("target", {})
+                    essential_relationships.append({
+                        "source": source.get("name", "Unknown"),
+                        "source_type": source.get("type", "Unknown"),
+                        "relationship": rel.get("type", "RELATED_TO"),
+                        "target": target.get("name", "Unknown"),
+                        "target_type": target.get("type", "Unknown")
+                    })
+        
         return {
             "major_entities": major_entities,
             "entity_count": len(entity_list),
-            "relationship_count": len(relationships) if isinstance(relationships, list) else 0
+            "relationship_count": len(relationships) if isinstance(relationships, list) else 0,
+            "relationships": essential_relationships
         }
     
     def _extract_essential_references(self, references: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
@@ -870,14 +904,14 @@ class MedicalAgentOrchestrator:
         )
         
         # Enhanced keyword fallback with weighted scoring
+        # Use actual agent keys from self.agents
         agent_scores = {
-            "general": 0,
+            "general_medical_query": 0,
             "diagnostic": 0,
             "treatment": 0,
             "drug_interaction": 0,
-            "research": 0,
-            "web_search": 0,
-            "validation": 0
+            "research_and_web_search": 0,
+            "preventive_care_and_risk_assessment": 0
         }
         
         # High priority emergency keywords (weight: 3)
@@ -885,47 +919,49 @@ class MedicalAgentOrchestrator:
                              "difficulty breathing", "unconscious", "bleeding", "poisoning"]
         for keyword in emergency_critical:
             if keyword in query.lower():
-                agent_scores["general"] += 3
+                agent_scores["general_medical_query"] += 3
         
         # Diagnostic keywords (weight: 2)
         diagnostic_terms = ["symptoms", "diagnosis", "what is", "condition", "disease", 
-                           "signs", "causes", "disorder"]
+                           "signs", "causes", "disorder", "diagnose"]
         for keyword in diagnostic_terms:
             if keyword in query.lower():
                 agent_scores["diagnostic"] += 2
         
         # Treatment keywords (weight: 2)
         treatment_terms = ["treatment", "therapy", "cure", "medication", "surgery", 
-                          "management", "intervention"]
+                          "management", "intervention", "treat", "therapies"]
         for keyword in treatment_terms:
             if keyword in query.lower():
                 agent_scores["treatment"] += 2
         
         # Drug interaction keywords (weight: 2)
         drug_terms = ["interaction", "side effects", "contraindication", "allergy", 
-                     "adverse", "dosage", "drug"]
+                     "adverse", "dosage", "drug", "medications", "prescribe"]
         for keyword in drug_terms:
             if keyword in query.lower():
                 agent_scores["drug_interaction"] += 2
         
-        # Research keywords (weight: 1)
+        # Research keywords (weight: 2)
         research_terms = ["research", "study", "trial", "latest", "new", "evidence", 
-                         "systematic review"]
+                         "systematic review", "pharmacogenomics", "genetic", "molecular"]
         for keyword in research_terms:
             if keyword in query.lower():
-                agent_scores["research"] += 1
+                agent_scores["research_and_web_search"] += 2
         
-        # Validation keywords (weight: 1)
-        validation_terms = ["verify", "fact check", "guidelines", "safety", "validate"]
-        for keyword in validation_terms:
+        # Preventive care keywords (weight: 2)
+        preventive_terms = ["screening", "prevention", "risk", "vaccine", "immunization",
+                          "checkup", "annual", "lifestyle", "diet", "exercise"]
+        for keyword in preventive_terms:
             if keyword in query.lower():
-                agent_scores["validation"] += 1
+                agent_scores["preventive_care_and_risk_assessment"] += 2
         
         # General health info keywords (weight: 1)
-        general_terms = ["information", "education", "general", "basic", "explain"]
+        general_terms = ["information", "education", "general", "basic", "explain", 
+                        "how does", "what is", "why do"]
         for keyword in general_terms:
             if keyword in query.lower():
-                agent_scores["web_search"] += 1
+                agent_scores["general_medical_query"] += 1
         
         # Return the agent with the highest score
         if max(agent_scores.values()) > 0:

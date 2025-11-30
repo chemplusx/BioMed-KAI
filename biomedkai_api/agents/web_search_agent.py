@@ -15,7 +15,7 @@ class WebSearchAgent(BaseMedicalAgent):
     
     def __init__(self, model: Any, tools: Dict[str, Any], config: Dict[str, Any]):
         super().__init__(
-            name="web_search",
+            name="research_and_web_search",
             role=AgentRole.WEB_SEARCH.value,
             model=model,
             tools=tools,
@@ -389,3 +389,15 @@ Provide comprehensive, evidence-based research synthesis.
 
     def _get_system_prompt(self):
         return self.search_synthesis_prompt
+    
+    def _get_relevant_entity_types(self) -> List[str]:
+        """
+        For web search/research we want broad coverage to provide context:
+        - All major entity types for comprehensive information
+        """
+        return [
+            "Disease", "Drug", "Compound",
+            "Gene", "Pathway", "MolecularFunction",
+            "BiologicalProcess", "Effect/Phenotype",
+            "Anatomy"
+        ]

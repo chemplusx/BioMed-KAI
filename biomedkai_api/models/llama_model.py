@@ -355,13 +355,13 @@ class LlamaModelWrapper:
         completion_chunks = self.model.create_completion(
             formatted_prompt,
             max_tokens=8192,
-            temperature=0.9,
-            top_p=0.1,
-            min_p=0.5,
+            temperature=0.7,  # Lower temperature for more coherent output
+            top_p=0.9,  # Increased for better diversity
+            min_p=0.05,  # Lower min_p
             typical_p=1,
-            frequency_penalty=0.6,
+            frequency_penalty=0.3,  # Reduced to allow more natural repetition
             presence_penalty=0,
-            repeat_penalty=1.18,
+            repeat_penalty=1.1,  # Reduced repeat penalty
             top_k=40,
             stream=True,
             seed=-1,
@@ -373,26 +373,32 @@ class LlamaModelWrapper:
 
         output = ""
         tool_call = ""
-        can_yield = False
+        started_yielding = False
         print("################### Completion chunks: ", completion_chunks)
         for completion_chunk in completion_chunks:
-            # print("---!!!!-----============== :::::: completion_chunk: ", completion_chunk)
             delta = completion_chunk["choices"][0]["text"]
-            # print("output text: ", delta)
-            # text = ""
-            # if "content" in delta:
-            #     text = delta["content"]
-            
             output += delta
-            if len(output) > 20:
-                if "<function" not in output and "Please wait" not in output and can_yield == False:
-                    yield f"{output}"
-                    can_yield = True
-                elif "</function>" in output:
+            
+            # Skip internal function calls or wait messages
+            if "<function" in output or "Please wait" in output:
+                if "</function>" in output:
                     tool_call = output
                     output = ""
-                if can_yield == True:
-                    yield f"{delta}"
+                continue
+            
+            # Start yielding after we have some content (to skip any initial junk)
+            if not started_yielding:
+                # Wait for meaningful content (at least 10 chars without special tokens)
+                if len(output) > 10 and not any(tok in output for tok in ['<|', '<<', '>>', '[[']):
+                    # Clean up any leading whitespace or special chars
+                    clean_output = output.lstrip('\n\r\t ')
+                    if clean_output:
+                        yield clean_output
+                        started_yielding = True
+                        output = ""
+            else:
+                # Normal streaming after start
+                yield delta
                 
     async def generate_with_context(self,
                                    prompt: str,

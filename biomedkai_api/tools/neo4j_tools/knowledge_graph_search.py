@@ -1,6 +1,5 @@
 from typing import Dict, List, Any, Optional, Tuple
 from neo4j import GraphDatabase
-import json
 import re
 import spacy
 from sentence_transformers import SentenceTransformer
@@ -15,6 +14,25 @@ class KnowledgeGraphSearchTool(BaseTool):
     Advanced search medical knowledge graph in Neo4j with entity detection,
     hybrid search, and recommendation generation
     """
+    
+    # Vector index names - should match what's configured in Neo4j
+    # Note: Vector index "AllEntries" exists but seems inaccessible via procedure call
+    # Using fulltext search which works reliably
+    VECTOR_INDEX_NAME = None  # Disabled - fulltext search is working well
+    FULLTEXT_INDEX_NAME = "all_entities_index"  # Fulltext index for keyword search
+    
+    # Properties to exclude from results (large/not useful for display)
+    EXCLUDE_PROPERTIES = ['embedding']
+    
+    # Node labels that contain relationships (not shadow/index nodes)
+    MEDICAL_NODE_LABELS = [
+        'Disease', 'Drug', 'Symptom', 'Gene', 'Protein', 'Pathway', 
+        'Metabolite', 'Compound', 'Phenotype', 'Tissue', 'Biological_process',
+        'Chromosome', 'Transcript', 'Complex', 'Food', 'Modification'
+    ]
+    
+    # Labels to filter out (index/shadow nodes)
+    GENERIC_LABELS = ['AllEntries', 'Node', 'Entity']
     
     def __init__(self, config: Optional[Dict[str, Any]] = None):
         super().__init__(
@@ -34,7 +52,7 @@ class KnowledgeGraphSearchTool(BaseTool):
         # Initialize sentence transformer for embeddings
         self.model = SentenceTransformer('BAAI/bge-large-en-v1.5', trust_remote_code=True)
         
-        # Medical entity labels
+        # Medical entity labels for NLP detection
         self.medical_labels = {
             'DISEASE', 'CHEMICAL', 'GENE', 'PROTEIN', 'DRUG', 
             'MEDCOND', 'DIAGNOSIS', 'MEDPROC', 'ANATOMY', 'SYMPTOM', 'COMPOUND',
@@ -104,22 +122,43 @@ class KnowledgeGraphSearchTool(BaseTool):
         try:
             # Preprocess query and detect entities
             processed_entities = self._preprocess_query(query)
-            detected_entities = await self._detect_entities_from_index(query)
+            print(f"[KG Search] Processing query: {query[:100]}...")
+            print(f"[KG Search] Preprocessed entities: {processed_entities}")
+            
+            # Try vector search if index is configured
+            detected_entities = []
+            if self.VECTOR_INDEX_NAME:
+                detected_entities = await self._detect_entities_from_index(query)
+                print(f"[KG Search] Detected {len(detected_entities)} entities from vector index")
+            else:
+                print(f"[KG Search] Vector index disabled, using fulltext search only")
             
             # Determine search strategy
-            if use_hybrid_search and detected_entities:
-                # Use hybrid search with best detected entity
+            if use_hybrid_search and detected_entities and self.VECTOR_INDEX_NAME:
                 best_match = detected_entities[0]
-                search_results = await self._hybrid_search(best_match['text'], limit)
+                print(f"[KG Search] Using hybrid search with best match: {best_match.get('text', 'unknown')}")
+                search_results = await self._hybrid_search(
+                    best_match['text'],
+                    k=limit,
+                    entity_types=entity_types,
+                )
                 entities = self._format_hybrid_results(search_results)
             else:
-                # Fallback to traditional entity search
+                print(f"[KG Search] Using traditional fulltext search")
                 entities = await self._search_entities(query, entity_types, limit)
+            
+            # Fallback: if no entities found, try fulltext search with the original query
+            if not entities and detected_entities:
+                print(f"[KG Search] No entities from hybrid search, trying fulltext fallback")
+                entities = await self._search_entities(query, entity_types, limit)
+            
+            print(f"[KG Search] Found {len(entities)} entities")
             
             # Get relationships if requested
             relationships = []
             if include_relationships and entities:
                 relationships = await self._get_relationships(entities[:3])
+                print(f"[KG Search] Found {len(relationships)} relationships")
             
             # Generate recommendations
             recommendations = []
@@ -143,6 +182,9 @@ class KnowledgeGraphSearchTool(BaseTool):
             }
             
         except Exception as e:
+            import traceback
+            print(f"[KG Search] ERROR: {str(e)}")
+            print(f"[KG Search] Traceback: {traceback.format_exc()}")
             return {
                 "query": query,
                 "entities": [],
@@ -244,213 +286,356 @@ class KnowledgeGraphSearchTool(BaseTool):
         return False
     
     async def _detect_entities_from_index(self, text: str) -> List[Dict[str, Any]]:
-        """Detect medical entities by querying Neo4j fulltext index"""
-        embedding = self.model.encode(text).tolist()
+        """Detect medical entities by querying Neo4j vector index
         
+        Returns entities with their original type (from o_label or node labels)
+        """
+        try:
+            print(f"[KG Search] Encoding text for vector search...")
+            embedding = self.model.encode(text).tolist()
+            print(f"[KG Search] Embedding generated, dimension: {len(embedding)}")
+            
+            def run_query(tx):
+                # Query the vector index and get node properties including original label
+                # Using low threshold to get more results
+                cypher_query = """
+                CALL db.index.vector.queryNodes($index, $k, $embedding) 
+                YIELD node, score 
+                RETURN DISTINCT {
+                    text: node.name,
+                    labels: labels(node),
+                    o_label: node.o_label,
+                    score: score,
+                    f_key: node.f_key,
+                    id: node.id
+                } as result
+                ORDER BY result.score DESC
+                """
+                result = tx.run(
+                    cypher_query,
+                    index=self.VECTOR_INDEX_NAME,
+                    embedding=embedding,
+                    k=15  # Get more results for better coverage
+                )
+                return [record["result"] for record in result]
+            
+            print(f"[KG Search] Querying vector index: {self.VECTOR_INDEX_NAME}")
+            with self.driver.session() as session:
+                results = session.read_transaction(run_query)
+                print(f"[KG Search] Vector query returned {len(results)} raw results")
+                
+                entities = []
+                seen = set()
+                for result in results:
+                    if result.get('text'):
+                        # Get the original type - prefer o_label, then filter labels for non-generic ones
+                        node_labels = result.get('labels', [])
+                        specific_labels = [l for l in node_labels if l not in self.GENERIC_LABELS]
+                        
+                        original_type = (
+                            result.get('o_label') or 
+                            (specific_labels[0] if specific_labels else None) or
+                            (node_labels[0] if node_labels else 'Unknown')
+                        )
+                        
+                        # Create unique key based on name and type
+                        key = f"{result['text'].lower()}_{original_type}"
+                        if key not in seen:
+                            entities.append({
+                                "text": result['text'],
+                                "type": original_type,
+                                "label": original_type,  # Keep for backward compatibility
+                                "o_label": result.get('o_label', original_type),
+                                "score": result['score'],
+                                "f_key": result.get('f_key', key),
+                                "id": result.get('id')
+                            })
+                            seen.add(key)
+                
+                if entities:
+                    print(f"[KG Search] Top entity: {entities[0].get('text')} ({entities[0].get('type')}) score: {entities[0].get('score')}")
+                
+                return entities
+                
+        except Exception as e:
+            import traceback
+            print(f"[KG Search] ERROR in _detect_entities_from_index: {str(e)}")
+            print(f"[KG Search] Traceback: {traceback.format_exc()}")
+            return []
+    
+    async def _hybrid_search(
+        self,
+        query: str,
+        k: int = 5,
+        entity_types: Optional[List[str]] = None
+    ) -> List[Dict[str, Any]]:
+        """Perform hybrid vector + fulltext search, optionally filtered by entity_types."""
+        embedding = self.model.encode(query).tolist()
+        entity_types = entity_types or []
+
         def run_query(tx):
-            cypher_query = """
-            CALL db.index.vector.queryNodes($index, $k, $embedding) 
-            YIELD node, score 
-            WHERE score > 0.8
-            RETURN DISTINCT {
-                text: node.name,
-                label: head(labels(node)),
-                o_label: node.o_label,
-                score: score
-            } as result
-            ORDER BY result.score DESC
+            cypher = """
+            CALL db.index.vector.queryNodes($index, $k, $embedding)
+            YIELD node, score
             """
-            result = tx.run(
-                cypher_query,
-                index="AllEntities",
-                embedding=embedding,
-                k=5
-            )
-            return [record["result"] for record in result]
-        
+            if entity_types:
+                cypher += """
+                WHERE any(label IN labels(node) WHERE label IN $entity_types)
+                   OR node.o_label IN $entity_types
+                """
+            cypher += """
+            RETURN node AS root, score, labels(node) AS node_labels
+            ORDER BY score DESC
+            """
+
+            params = {
+                "index": self.VECTOR_INDEX_NAME,
+                "k": k,
+                "embedding": embedding,
+                "entity_types": entity_types,
+            }
+            result = tx.run(cypher, **params)
+            return [r.data() for r in result]
+
         with self.driver.session() as session:
             results = session.read_transaction(run_query)
-            
-            entities = []
-            seen = set()
-            for result in results:
-                if result['text'] and result['label']:
-                    key = f"{result['o_label']}"
-                    if key not in seen:
-                        entities.append({
-                            "text": result['text'],
-                            "label": result['label'],
-                            "score": result['score'],
-                            "o_label": result['o_label'],
-                            "f_key": key
-                        })
-                        seen.add(key)
-            
-            return entities
-    
-    async def _hybrid_search(self, query: str, k: int = 5) -> List[Dict[str, Any]]:
-        """Perform hybrid vector and fulltext search"""
-        embedding = self.model.encode(query).tolist()
-        
-        def run_query(tx):
-            cypher_query = """
-            CALL {
-                CALL db.index.vector.queryNodes($index, $k, $embedding)
-                YIELD node, score
-                RETURN node, score
-                UNION
-                CALL db.index.fulltext.queryNodes($keyword_index, $text_query, {limit: $k})
-                YIELD node, score
-                RETURN node, score
-            }
-            WITH node, score
-            ORDER BY score DESC
 
-            MATCH (n:Protein|Drug|Phenotype|Disease|Gene|Metabolite|Pathway|Biological_process|Peptide|Transcript|Compound|Tissue|Symptom) 
-            WHERE id(n) = node.f_key
-            WITH collect({node: n, score: score}) AS top_nodes
+        return results
 
-            UNWIND top_nodes AS top_node_data
-            WITH top_node_data.node AS root_node, top_node_data.score AS score
-
-            // Find related entities
-            OPTIONAL MATCH (root_node)-[r1]-(disease:Disease)
-            WHERE root_node <> disease
-            WITH root_node, score, collect(DISTINCT {entity: disease{.*, embedding:null}, rel_type: type(r1)})[..3] AS related_diseases
-
-            OPTIONAL MATCH (root_node)-[r2]-(protein:Protein)
-            WHERE root_node <> protein
-            WITH root_node, score, related_diseases, collect(DISTINCT {entity: protein{.*, embedding:null}, rel_type: type(r2)})[..3] AS related_proteins
-
-            OPTIONAL MATCH (root_node)-[r3]-(drug:Drug|Compound)
-            WHERE root_node <> drug
-            WITH root_node, score, related_diseases, related_proteins, collect(DISTINCT {entity: drug{.*, embedding:null}, rel_type: type(r3)})[..3] AS related_drugs
-
-            OPTIONAL MATCH (root_node)-[r4]-(metabolite:Metabolite)
-            WHERE root_node <> metabolite
-            WITH root_node, score, related_diseases, related_proteins, related_drugs, collect(DISTINCT {entity: metabolite{.*, embedding:null}, rel_type: type(r4)})[..3] AS related_metabolites
-
-            OPTIONAL MATCH (root_node)-[r5]-(gene:Gene)
-            WHERE root_node <> gene
-            WITH root_node, score, related_diseases, related_proteins, related_drugs, related_metabolites, collect(DISTINCT {entity: gene{.*, embedding:null}, rel_type: type(r5)})[..3] AS related_genes
-
-            RETURN {
-                score: score,
-                metadata: labels(root_node)[0],
-                root: root_node{.*, embedding:null},
-                related_nodes: {
-                    diseases: [d IN related_diseases WHERE d.entity IS NOT NULL | {
-                        properties: d.entity,
-                        relationship: d.rel_type
-                    }],
-                    proteins: [p IN related_proteins WHERE p.entity IS NOT NULL | {
-                        properties: p.entity,
-                        relationship: p.rel_type
-                    }],
-                    drugs: [d IN related_drugs WHERE d.entity IS NOT NULL | {
-                        properties: d.entity,
-                        relationship: d.rel_type
-                    }],
-                    metabolites: [m IN related_metabolites WHERE m.entity IS NOT NULL | {
-                        properties: m.entity,
-                        relationship: m.rel_type
-                    }],
-                    genes: [g IN related_genes WHERE g.entity IS NOT NULL | {
-                        properties: g.entity,
-                        relationship: g.rel_type
-                    }]
-                }
-            } AS result
-            """
-            result = tx.run(
-                cypher_query,
-                index="AllEntities",
-                keyword_index="all_entities_index",
-                k=k,
-                embedding=embedding,
-                text_query=query
-            )
-            return [record["result"] for record in result]
-        
-        with self.driver.session() as session:
-            return session.read_transaction(run_query)
     
     def _format_hybrid_results(self, results: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Format hybrid search results to standard entity format"""
         entities = []
         for result in results:
             root = result.get('root', {})
+            # Get node labels from the query result, filter out generic labels
+            node_labels = result.get('node_labels', [])
+            # Filter out 'AllEntries' and similar generic labels, prioritize specific ones
+            specific_labels = [l for l in node_labels if l not in self.GENERIC_LABELS]
+            # Use o_label from node properties if available, otherwise use first specific label
+            primary_label = root.get('o_label') or (specific_labels[0] if specific_labels else (node_labels[0] if node_labels else 'Unknown'))
+            
+            # Filter out large/unnecessary properties like embeddings
+            filtered_props = {k: v for k, v in root.items() if k not in self.EXCLUDE_PROPERTIES}
+            
             entities.append({
-                "id": root.get('f_key', 'unknown'),
+                "id": root.get('f_key', root.get('id', 'unknown')),
                 "name": root.get('name', 'Unknown'),
-                "labels": [result.get('metadata', 'Unknown')],
+                "labels": specific_labels if specific_labels else node_labels,
+                "type": primary_label,  # Add explicit type field
                 "score": result.get('score', 0),
-                "properties": root,
+                "properties": filtered_props,
                 "related_nodes": result.get('related_nodes', {})
             })
         return entities
+    
+    def _extract_medical_terms(self, query: str) -> List[str]:
+        """Extract key medical terms from a query for multi-term search"""
+        # Use NLP to extract entities
+        doc = self.nlp(query)
+        
+        # Collect medical terms
+        terms = set()
+        
+        # Get entities from NLP
+        for ent in doc.ents:
+            if ent.label_ not in ['QUESTION_PREFIX'] and len(ent.text) > 2:
+                terms.add(ent.text.lower())
+        
+        # Also extract noun chunks that might be medical terms
+        for chunk in doc.noun_chunks:
+            chunk_text = chunk.text.lower().strip()
+            # Check if it looks like a medical term
+            if any(pattern in chunk_text for pattern in ['disease', 'syndrome', 'condition', 'itis', 'osis', 'emia']):
+                terms.add(chunk_text)
+            # Check against known medical patterns
+            if self._is_medical_entity(chunk_text, ""):
+                terms.add(chunk_text)
+        
+        # Fallback: extract individual words that might be medical terms
+        medical_keywords = ['hypertension', 'asthma', 'diabetes', 'cancer', 'heart', 'lung', 
+                          'kidney', 'liver', 'brain', 'stroke', 'infection', 'pain',
+                          'fever', 'cough', 'fatigue', 'nausea', 'vertigo', 'dizziness']
+        for word in query.lower().split():
+            word = word.strip('.,?!')
+            if word in medical_keywords or len(word) > 4 and any(p in word for p in ['tion', 'itis', 'osis', 'emia', 'pathy']):
+                terms.add(word)
+        
+        return list(terms) if terms else [query]
     
     async def _search_entities(self, 
                               query: str,
                               entity_types: List[str],
                               limit: int) -> List[Dict[str, Any]]:
-        """Traditional entity search using fulltext index"""
+        """Traditional entity search using fulltext index with multi-term support"""
         entities = []
+        seen_ids = set()
+        
+        try:
+            # Extract medical terms from the query
+            search_terms = self._extract_medical_terms(query)
+            print(f"[KG Search] Extracted medical terms: {search_terms}")
+            
+            with self.driver.session() as session:
+                # Search for each term to ensure we capture all relevant entities
+                for term in search_terms[:5]:  # Limit to 5 terms
+                    print(f"[KG Search] Searching for term: '{term}'")
+                    
+                    # Escape special Lucene characters and add fuzzy matching for typos
+                    escaped_term = term.replace(':', '\\:').replace('*', '\\*').replace('?', '\\?')
+                    # Add fuzzy matching (~) for terms > 4 chars to handle typos
+                    if len(term) > 4 and ' ' not in term:
+                        escaped_term = f"{escaped_term}~"  # Lucene fuzzy search
+                    
+                    cypher_query = """
+                    CALL db.index.fulltext.queryNodes($index, $search_query) 
+                    YIELD node, score
+                    WHERE (any(label IN labels(node) WHERE label IN $entity_types)
+                       OR node.o_label IN $entity_types)
+                    RETURN node, score, labels(node) as labels
+                    ORDER BY score DESC
+                    LIMIT $limit
+                    """
+                    
+                    result = session.run(
+                        cypher_query,
+                        index=self.FULLTEXT_INDEX_NAME,
+                        search_query=escaped_term,
+                        entity_types=entity_types,
+                        limit=limit // len(search_terms) + 2  # Distribute limit across terms
+                    )
+                    
+                    for record in result:
+                        node = record["node"]
+                        node_id = node.get("f_key", node.id)
+                        
+                        # Avoid duplicates
+                        if node_id in seen_ids:
+                            continue
+                        seen_ids.add(node_id)
+                        
+                        node_labels = record["labels"]
+                        specific_labels = [l for l in node_labels if l not in self.GENERIC_LABELS]
+                        primary_label = node.get("o_label") or (specific_labels[0] if specific_labels else (node_labels[0] if node_labels else 'Unknown'))
+                        
+                        # Filter out large/unnecessary properties like embeddings
+                        filtered_props = {k: v for k, v in dict(node).items() if k not in self.EXCLUDE_PROPERTIES}
+                        
+                        entities.append({
+                            "id": node_id,
+                            "name": node.get("name", "Unknown"),
+                            "labels": specific_labels if specific_labels else node_labels,
+                            "type": primary_label,
+                            "score": record["score"],
+                            "properties": filtered_props,
+                            "matched_term": term  # Track which term matched
+                        })
+                
+                # Sort by score
+                entities.sort(key=lambda x: x.get('score', 0), reverse=True)
+                entities = entities[:limit]  # Trim to limit
+                
+                print(f"[KG Search] Fulltext search returned {len(entities)} entities")
+                    
+        except Exception as e:
+            import traceback
+            print(f"[KG Search] ERROR in _search_entities: {str(e)}")
+            print(f"[KG Search] Traceback: {traceback.format_exc()}")
+                
+        return entities
+    
+    async def _get_relationships(self, entities: List[Dict[str, Any]], limit: int = 20) -> List[Dict[str, Any]]:
+        """Get relationships FROM entities to other relevant nodes (diseases, drugs, symptoms, etc.)
+        
+        This method handles the dual-node structure where:
+        - AllEntries nodes are used for vector indexing with o_label pointing to original type
+        - Original nodes (Disease, Symptom, etc.) hold the actual relationships
+        
+        Special focus on:
+        - Drug contraindications (IS_A_CONTRAINDICATION_FOR)
+        - Drug indications (INDICATED_FOR, IS_AN_INDICATION_FOR)
+        - Drug interactions (INTERACTS_WITH)
+        - Disease associations (ASSOCIATED_WITH)
+        """
+        relationships = []
+        
+        # Get entity names for name-based matching - extract core disease/drug names
+        entity_names = []
+        for e in entities:
+            name = e.get("name", "").lower().strip()
+            if name:
+                # Also extract the core name without IDs (e.g., "hypertension" from "hypertension - 5466")
+                core_name = name.split(' - ')[0].strip() if ' - ' in name else name
+                entity_names.append(name)
+                if core_name != name:
+                    entity_names.append(core_name)
+        
+        entity_names = list(set(entity_names))  # Remove duplicates
+        print(f"[KG Search] Searching relationships for: {entity_names[:5]}...")
+        
+        if not entity_names:
+            return relationships
         
         with self.driver.session() as session:
+            # Query relationships from nodes matching the entity names
+            # Focus on clinically relevant relationships
             cypher_query = """
-            CALL db.index.fulltext.queryNodes('all_entities_index', $query) 
-            YIELD node, score
-            WHERE any(label IN labels(node) WHERE label IN $entity_types)
-            RETURN node, score, labels(node) as labels
-            ORDER BY score DESC
+            // Find direct relationships
+            MATCH (n)-[r]-(m)
+            WHERE (toLower(n.name) IN $entity_names OR any(name IN $entity_names WHERE toLower(n.name) CONTAINS name))
+            AND NOT 'AllEntries' IN labels(n)
+            AND any(label IN labels(m) WHERE label IN $medical_labels)
+            AND NOT 'AllEntries' IN labels(m)
+            RETURN n, r, m, type(r) as rel_type, labels(n) as source_labels, labels(m) as target_labels
+            ORDER BY 
+                CASE type(r) 
+                    WHEN 'IS_A_CONTRAINDICATION_FOR' THEN 1
+                    WHEN 'INDICATED_FOR' THEN 2
+                    WHEN 'IS_AN_INDICATION_FOR' THEN 3
+                    WHEN 'INTERACTS_WITH' THEN 4
+                    WHEN 'ASSOCIATED_WITH' THEN 5
+                    ELSE 10
+                END
             LIMIT $limit
             """
             
             result = session.run(
-                cypher_query,
-                query=query,
-                entity_types=entity_types,
-                limit=limit
+                cypher_query, 
+                entity_names=entity_names, 
+                limit=limit,
+                medical_labels=self.MEDICAL_NODE_LABELS
             )
             
+            seen_relationships = set()
             for record in result:
-                node = record["node"]
-                entities.append({
-                    "id": node.id,
-                    "name": node.get("name", "Unknown"),
-                    "labels": record["labels"],
-                    "score": record["score"],
-                    "properties": dict(node)
-                })
+                source_node = record["n"]
+                target_node = record["m"]
+                rel_type = record["rel_type"]
                 
-        return entities
-    
-    async def _get_relationships(self, entities: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        """Get relationships between entities"""
-        relationships = []
-        entity_ids = [e["id"] for e in entities]
-        
-        with self.driver.session() as session:
-            cypher_query = """
-            MATCH (n)-[r]-(m)
-            WHERE id(n) IN $entity_ids AND id(m) IN $entity_ids
-            RETURN n, r, m, type(r) as rel_type
-            """
-            
-            result = session.run(cypher_query, entity_ids=entity_ids)
-            
-            for record in result:
+                # Get meaningful labels (filter out generic ones)
+                source_labels = [l for l in record["source_labels"] if l not in self.GENERIC_LABELS]
+                target_labels = [l for l in record["target_labels"] if l not in self.GENERIC_LABELS]
+                
+                # Create unique key to avoid duplicates
+                source_name = source_node.get('name', '')
+                target_name = target_node.get('name', '')
+                rel_key = f"{source_name}_{rel_type}_{target_name}"
+                if rel_key in seen_relationships:
+                    continue
+                seen_relationships.add(rel_key)
+                
                 relationships.append({
                     "source": {
-                        "id": record["n"].id,
-                        "name": record["n"].get("name", "Unknown")
+                        "id": source_node.get("id", source_node.get("f_key", "unknown")),
+                        "name": source_name or "Unknown",
+                        "type": source_labels[0] if source_labels else "Unknown"
                     },
                     "target": {
-                        "id": record["m"].id,
-                        "name": record["m"].get("name", "Unknown")
+                        "id": target_node.get("id", target_node.get("f_key", "unknown")),
+                        "name": target_name or "Unknown",
+                        "type": target_labels[0] if target_labels else "Unknown"
                     },
-                    "type": record["rel_type"],
+                    "type": rel_type,
                     "properties": dict(record["r"])
                 })
                 
@@ -464,7 +649,7 @@ class KnowledgeGraphSearchTool(BaseTool):
             return recommendations
             
         root_name = context.get('name', context.get('properties', {}).get('name', ''))
-        entity_type = context.get('labels', [''])[0] if context.get('labels') else ''
+        entity_type = context.get('type') or (context.get('labels', [''])[0] if context.get('labels') else '')
         related_nodes = context.get('related_nodes', {})
         
         # Type-specific recommendations
@@ -503,16 +688,17 @@ class KnowledgeGraphSearchTool(BaseTool):
         if detected_entities:
             context_parts.append("Detected Entities:")
             for entity in detected_entities[:3]:
+                entity_type = entity.get('type') or entity.get('o_label') or entity.get('label', 'Unknown')
                 context_parts.append(
-                    f"- {entity['text']} ({entity.get('o_label', entity['label'])}) - Score: {entity['score']:.2f}"
+                    f"- {entity['text']} ({entity_type}) - Score: {entity['score']:.2f}"
                 )
             context_parts.append("")
         
         # Main entities section
         context_parts.append("Search Results:")
         for i, entity in enumerate(entities[:3], 1):
-            entity_type = entity["labels"][0] if entity["labels"] else "Entity"
-            name = entity["name"]
+            entity_type = entity.get('type') or (entity["labels"][0] if entity.get("labels") else "Entity")
+            name = entity.get("name", "Unknown")
             
             context_parts.append(f"Result {i}:")
             context_parts.append(f"  Type: {entity_type}")
@@ -544,8 +730,10 @@ class KnowledgeGraphSearchTool(BaseTool):
         if relationships:
             context_parts.append("Direct Relationships:")
             for rel in relationships[:5]:
+                source_type = rel['source'].get('type', '')
+                target_type = rel['target'].get('type', '')
                 context_parts.append(
-                    f"- {rel['source']['name']} {rel['type']} {rel['target']['name']}"
+                    f"- {rel['source']['name']} ({source_type}) --[{rel['type']}]--> {rel['target']['name']} ({target_type})"
                 )
         
         return "\n".join(context_parts)
@@ -554,3 +742,4 @@ class KnowledgeGraphSearchTool(BaseTool):
         """Close Neo4j driver connection"""
         if hasattr(self, 'driver'):
             self.driver.close()
+
